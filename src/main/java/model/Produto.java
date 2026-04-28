@@ -48,7 +48,6 @@ public class Produto {
         return categoria;
     }
 
-    // --- SETTERS ---
     public void setNome(String nome) {
         this.nome = nome;
     }
