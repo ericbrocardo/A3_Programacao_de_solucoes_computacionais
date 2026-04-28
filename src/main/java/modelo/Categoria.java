@@ -26,3 +26,41 @@ public class Categoria {
         this.tamanho = tamanho;
         this.embalagem = embalagem;
     }
+//GET
+    public int getId() {
+        return id;
+    }
+
+    public String getNome() {
+        return nome;
+    }
+
+    public Tamanho getTamanho() {
+        return tamanho;
+    }
+
+    public Embalagem getEmbalagem() {
+        return embalagem;
+    }
+//SET
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public void setNome(String nome) {
+        this.nome = nome;
+    }
+
+    public void setTamanho(Tamanho t) {
+        this.tamanho = t;
+    }
+
+    public void setEmbalagem(Embalagem e) {
+        this.embalagem = e;
+    }
+//METODO DE SOBRESCRITA
+    @Override
+    public String toString() {
+        return nome;
+    }
+}
