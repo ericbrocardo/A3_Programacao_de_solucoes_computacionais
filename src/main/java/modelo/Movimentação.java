@@ -1,6 +1,13 @@
 package modelo;
 
-public class Movimentação {
-    
-}
+import java.time.LocalDate;
 
+public class Movimentacao {
+// (Opções Fixas)
+    public enum Tipo { ENTRADA, SAIDA }
+// ATRIBUTOS
+    private int id;
+    private Produto   produto;
+    private LocalDate data;
+    private double    quantidade;
+    private Tipo      tipo;
