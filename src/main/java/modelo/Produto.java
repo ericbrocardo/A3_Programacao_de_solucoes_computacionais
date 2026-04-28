@@ -91,3 +91,9 @@ public class Produto {
     public void setCategoria(Categoria c) {
         this.categoria = c;
     }
+    //METODO DE SOBRESCRITA
+    @Override
+    public String toString() {
+        return nome;
+    }
+}
