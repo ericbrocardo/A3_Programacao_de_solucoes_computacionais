@@ -8,14 +8,14 @@ package visao;
  *
  * @author golfi
  */
-public class NewJFrame extends javax.swing.JFrame {
+public class Interface extends javax.swing.JFrame {
     
-    private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(NewJFrame.class.getName());
+    private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(Interface.class.getName());
 
     /**
-     * Creates new form NewJFrame
+     * Creates new form Interface
      */
-    public NewJFrame() {
+    public Interface() {
         initComponents();
     }
 
@@ -66,7 +66,7 @@ public class NewJFrame extends javax.swing.JFrame {
         //</editor-fold>
 
         /* Create and display the form */
-        java.awt.EventQueue.invokeLater(() -> new NewJFrame().setVisible(true));
+        java.awt.EventQueue.invokeLater(() -> new Interface().setVisible(true));
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
