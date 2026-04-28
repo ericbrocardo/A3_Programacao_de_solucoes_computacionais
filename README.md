@@ -44,5 +44,5 @@ Github: viniciusw2408-lang
 
 ## Observação
 
-Este projeto ainda está sendo desenvolvido, com possiblidade de ter alterações e atualizações de acordo com o que for preciso 
+Este projeto ainda está sendo desenvolvido, com possiblidade de ter alterações e atualizações de acordo com o que for preciso, 
 e os ajustes e comentários do professor responsável.
