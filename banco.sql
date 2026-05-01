@@ -33,3 +33,4 @@ CREATE TABLE IF NOT EXISTS movimentacao (
     tipo       ENUM('ENTRADA','SAIDA') NOT NULL,
     FOREIGN KEY (produto_id) REFERENCES produto(id)
 );
+
