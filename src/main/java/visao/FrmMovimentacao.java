@@ -187,3 +187,52 @@ public class FrmMovimentacao extends JFrame {
             Mensagem.erro("Erro ao registrar: " + e.getMessage());
         }
     }
+
+    private void limpar() {
+        cmbProduto.setSelectedIndex(-1);
+        cmbTipo.setSelectedIndex(0);
+        txtData.setText(LocalDate.now().format(FORMATO));
+        txtQuantidade.setText("");
+    }
+
+    private void carregarTabela() {
+        modelo.setRowCount(0);
+        try {
+            List<Movimentacao> lista = movDAO.listarTodas();
+            for (Movimentacao m : lista) {
+                modelo.addRow(new Object[]{
+                    m.getId(),
+                    m.getProduto() != null ? m.getProduto().getNome() : "",
+                    m.getTipo().name(),
+                    m.getQuantidade(),
+                    m.getData().format(FORMATO)
+                });
+            }
+        } catch (SQLException e) {
+            Mensagem.erro("Erro ao carregar movimentações: " + e.getMessage());
+        }
+    }
+
+    private void carregarProdutos() {
+        Produto selecionado = (Produto) cmbProduto.getSelectedItem();
+        cmbProduto.removeAllItems();
+        try {
+            List<Produto> lista = produtoDAO.listarTodos();
+            for (Produto p : lista) {
+                cmbProduto.addItem(p);
+            }
+            cmbProduto.setSelectedItem(selecionado);
+        } catch (SQLException e) {
+            Mensagem.erro("Erro ao carregar produtos: " + e.getMessage());
+        }
+    }
+
+    private void estilizarBotao(JButton btn, Color cor) {
+        btn.setBackground(cor);
+        btn.setForeground(Color.WHITE);
+        btn.setFocusPainted(false);
+        btn.setBorderPainted(false);
+        btn.setFont(new Font("Segoe UI", Font.BOLD, 12));
+        btn.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        btn.setPreferredSize(new Dimension(110, 32));
+    }
