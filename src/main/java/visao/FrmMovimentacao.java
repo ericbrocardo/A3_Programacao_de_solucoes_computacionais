@@ -114,3 +114,76 @@ public class FrmMovimentacao extends JFrame {
         tabela.getColumnModel().getColumn(0).setMaxWidth(45);
         add(new JScrollPane(tabela), BorderLayout.CENTER);
     }
+
+    private void registrar() {
+        Produto produto  = (Produto) cmbProduto.getSelectedItem();
+        Tipo tipo        = (Tipo)    cmbTipo.getSelectedItem();
+        String dataStr   = txtData.getText().trim();
+        String qtdStr    = txtQuantidade.getText().trim();
+
+        if (produto == null || tipo == null || dataStr.isEmpty() || qtdStr.isEmpty()) {
+            Mensagem.aviso("Preencha todos os campos.");
+            return;
+        }
+
+        LocalDate data;
+        try {
+            data = LocalDate.parse(dataStr, FORMATO);
+        } catch (DateTimeParseException e) {
+            Mensagem.erro("Data inválida. Use o formato dd/MM/yyyy.");
+            return;
+        }
+
+        double quantidade;
+        try {
+            quantidade = Double.parseDouble(qtdStr.replace(",", "."));
+            if (quantidade <= 0) throw new NumberFormatException();
+        } catch (NumberFormatException e) {
+            Mensagem.erro("Quantidade inválida. Informe um número maior que zero.");
+            return;
+        }
+
+        double novoSaldo;
+        if (tipo == Tipo.ENTRADA) {
+            novoSaldo = produto.getQtdEstoque() + quantidade;
+        } else {
+            novoSaldo = produto.getQtdEstoque() - quantidade;
+            if (novoSaldo < 0) {
+                Mensagem.erro("Estoque insuficiente!\nSaldo atual: " + produto.getQtdEstoque());
+                return;
+            }
+        }
+
+        try {
+            movDAO.inserir(new Movimentacao(0, produto, data, quantidade, tipo));
+            produtoDAO.atualizarEstoque(produto.getId(), novoSaldo);
+
+            if (tipo == Tipo.SAIDA && novoSaldo < produto.getQtdMinima()) {
+                Mensagem.aviso(
+                    "⚠️ ESTOQUE BAIXO!\n\n" +
+                    "Produto: " + produto.getNome() + "\n" +
+                    "Saldo atual: " + novoSaldo + "\n" +
+                    "Quantidade mínima: " + produto.getQtdMinima() + "\n\n" +
+                    "Providencie a compra deste produto!"
+                );
+            }
+
+            if (tipo == Tipo.ENTRADA && novoSaldo > produto.getQtdMaxima()) {
+                Mensagem.aviso(
+                    "⚠️ ESTOQUE CHEIO!\n\n" +
+                    "Produto: " + produto.getNome() + "\n" +
+                    "Saldo atual: " + novoSaldo + "\n" +
+                    "Quantidade máxima: " + produto.getQtdMaxima() + "\n\n" +
+                    "Não é necessário comprar mais deste produto!"
+                );
+            }
+
+            Mensagem.info("Movimentação registrada com sucesso!");
+            limpar();
+            carregarProdutos();
+            carregarTabela();
+
+        } catch (SQLException e) {
+            Mensagem.erro("Erro ao registrar: " + e.getMessage());
+        }
+    }
