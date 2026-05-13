@@ -39,6 +39,12 @@ import java.awt.*;
             JButton btnReajuste = criarBotao("💲   Reajuste de Preços", new Color(230, 126, 34));
             JButton btnRelatorios = criarBotao("📊   Relatórios", new Color(192, 57, 43));
 
+            btnCategorias.addActionListener(e -> abrirCategorias());
+            btnProdutos.addActionListener(e -> abrirProdutos());
+            btnMovimentacoes.addActionListener(e -> abrirMovimentacoes());
+            btnReajuste.addActionListener(e -> abrirReajuste());
+            btnRelatorios.addActionListener(e -> abrirRelatorios());
+
             pnlBotoes.add(btnCategorias);
             pnlBotoes.add(btnProdutos);
             pnlBotoes.add(btnMovimentacoes);
@@ -61,3 +67,24 @@ import java.awt.*;
         btn.setPreferredSize(new Dimension(0, 42));
         return btn;
     }
+
+    private void abrirCategorias() {
+        new FrmCategoria().setVisible(true);
+    }
+
+    private void abrirProdutos() {
+        new FrmProduto().setVisible(true);
+    }
+
+    private void abrirMovimentacoes() {
+        new FrmMovimentacao().setVisible(true);
+    }
+
+    private void abrirReajuste() {
+        new FrmReajuste().setVisible(true);
+    }
+
+    private void abrirRelatorios() {
+        new FrmRelatorio().setVisible(true);
+    }
+
