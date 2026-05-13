@@ -68,3 +68,47 @@ public class FrmReajuste extends JFrame {
 
         add(pnlCentro, BorderLayout.CENTER);
     }
+        private void aplicar() {
+        String texto = txtPercentual.getText().trim().replace(",", ".");
+
+        if (texto.isEmpty()) {
+            lblResultado.setForeground(new Color(230, 126, 34));
+            lblResultado.setText("Informe o percentual de reajuste.");
+            return;
+        }
+
+        double percentual;
+        try {
+            percentual = Double.parseDouble(texto);
+        } catch (NumberFormatException e) {
+            lblResultado.setForeground(new Color(231, 76, 60));
+            lblResultado.setText("Valor inválido. Use números como 10 ou 10.5");
+            return;
+        }
+
+        if (percentual == 0) {
+            lblResultado.setForeground(new Color(230, 126, 34));
+            lblResultado.setText("O percentual não pode ser zero.");
+            return;
+        }
+
+        String direcao = percentual > 0 ? "aumento" : "redução";
+        String msg = String.format(
+            "Confirma o %s de %.2f%% nos preços\nde TODOS os produtos?",
+            direcao, Math.abs(percentual)
+        );
+
+        if (Mensagem.confirmar(msg)) {
+            try {
+                produtoDAO.reajustarPrecos(percentual);
+                lblResultado.setForeground(new Color(39, 174, 96));
+                lblResultado.setText(String.format(
+                    "✔ Reajuste de %.2f%% aplicado com sucesso!", percentual
+                ));
+                txtPercentual.setText("");
+            } catch (SQLException e) {
+                lblResultado.setForeground(new Color(231, 76, 60));
+                lblResultado.setText("Erro: " + e.getMessage());
+            }
+        }
+    }
