@@ -1,13 +1,19 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package visao;
 
-/**
- *
- * @author arthurcoelho
- */
-public class FrmReajuste {
-    
+import dao.ProdutoDAO;
+
+import javax.swing.*;
+import java.awt.*;
+import java.sql.SQLException;
+
+public class FrmReajuste extends JFrame {
+
+    private JTextField txtPercentual;
+    private JLabel lblResultado;
+
+    private final ProdutoDAO produtoDAO = new ProdutoDAO();
+
+    public FrmReajuste() {
+        initComponents();
+    }
 }
