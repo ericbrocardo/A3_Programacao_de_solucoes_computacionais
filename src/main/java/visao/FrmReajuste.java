@@ -112,3 +112,13 @@ public class FrmReajuste extends JFrame {
             }
         }
     }
+        
+    private void estilizarBotao(JButton btn, Color cor) {
+        btn.setBackground(cor);
+        btn.setForeground(Color.WHITE);
+        btn.setFocusPainted(false);
+        btn.setBorderPainted(false);
+        btn.setFont(new Font("Segoe UI", Font.BOLD, 13));
+        btn.setCursor(new Cursor(Cursor.HAND_CURSOR));
+    }
+ }
