@@ -16,6 +16,8 @@ public class FrmCategoria extends JFrame {
     private JTextField txtNome;
     private JComboBox<Tamanho> cmbTamanho;
     private JComboBox<Embalagem> cmbEmbalagem;
+    private JTable tabela;
+    private DefaultTableModel modelo;
 
     private final CategoriaDAO dao = new CategoriaDAO();
     private Categoria categoriaSelecionada = null;
@@ -74,5 +76,21 @@ public class FrmCategoria extends JFrame {
         pnlForm.add(cmbEmbalagem, gbc);
 
         add(pnlForm, BorderLayout.NORTH);
+
+// ── Tabela ──────────────────────────────────
+        modelo = new DefaultTableModel(
+                new String[]{"ID", "Nome", "Tamanho", "Embalagem"}, 0) {
+            @Override
+            public boolean isCellEditable(int r, int c) {
+                return false;
+            }
+        };
+
+        tabela = new JTable(modelo);
+        tabela.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        tabela.setRowHeight(24);
+        tabela.getColumnModel().getColumn(0).setMaxWidth(50);
+
+        add(new JScrollPane(tabela), BorderLayout.CENTER);
     }
 }
