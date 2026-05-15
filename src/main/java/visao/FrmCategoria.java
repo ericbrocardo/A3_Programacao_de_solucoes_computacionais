@@ -90,6 +90,7 @@ import java.util.List;
             estilizarBotao(btnExcluir, new Color(231, 76, 60));
 
             btnSalvar.addActionListener(e -> salvar());
+            btnExcluir.addActionListener(e -> excluir());
 
             pnlBotoes.add(btnSalvar);
             pnlBotoes.add(btnLimpar);
@@ -156,5 +157,22 @@ import java.util.List;
             carregarTabela();
         } catch (SQLException e) {
             Mensagem.erro("Erro ao salvar: " + e.getMessage());
+        }
+    }
+
+    private void excluir() {
+        if (categoriaSelecionada == null) {
+            Mensagem.aviso("Selecione uma categoria para excluir.");
+            return;
+        }
+        if (Mensagem.confirmar("Deseja excluir a categoria \"" + categoriaSelecionada.getNome() + "\"?")) {
+            try {
+                dao.excluir(categoriaSelecionada.getId());
+                Mensagem.info("Categoria excluída com sucesso!");
+                limpar();
+                carregarTabela();
+            } catch (SQLException e) {
+                Mensagem.erro("Erro ao excluir: " + e.getMessage());
+            }
         }
     }
