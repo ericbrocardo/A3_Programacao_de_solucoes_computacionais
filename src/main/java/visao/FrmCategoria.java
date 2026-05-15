@@ -91,6 +91,7 @@ import java.util.List;
 
             btnSalvar.addActionListener(e -> salvar());
             btnExcluir.addActionListener(e -> excluir());
+            btnLimpar.addActionListener(e -> limpar());
 
             pnlBotoes.add(btnSalvar);
             pnlBotoes.add(btnLimpar);
@@ -175,4 +176,12 @@ import java.util.List;
                 Mensagem.erro("Erro ao excluir: " + e.getMessage());
             }
         }
+    }
+
+    private void limpar() {
+        txtNome.setText("");
+        cmbTamanho.setSelectedIndex(0);
+        cmbEmbalagem.setSelectedIndex(0);
+        tabela.clearSelection();
+        categoriaSelecionada = null;
     }
