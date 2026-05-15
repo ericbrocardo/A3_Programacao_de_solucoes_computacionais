@@ -9,7 +9,7 @@ public class CategoriaDAO {
 
     public void inserir(Categoria c) {
         String sql = "INSERT INTO categoria (nome, tamanho, embalagem) VALUES (?, ?, ?)";
-        Connection conn = ConnectionFactory.getConnection();
+        Connection conn = ConexaoDB.getConnection();
         try {
             PreparedStatement ps = conn.prepareStatement(sql);
             ps.setString(1, c.getNome());
@@ -19,13 +19,13 @@ public class CategoriaDAO {
         } catch (SQLException e) {
             throw new RuntimeException("Erro ao inserir categoria: " + e.getMessage(), e);
         } finally {
-            ConnectionFactory.closeConnection(conn);
+            ConexaoDB.closeConnection(conn);
         }
     }
 
     public void atualizar(Categoria c) {
         String sql = "UPDATE categoria SET nome = ?, tamanho = ?, embalagem = ? WHERE id = ?";
-        Connection conn = ConnectionFactory.getConnection();
+        Connection conn = ConexaoDB.getConnection();
         try {
             PreparedStatement ps = conn.prepareStatement(sql);
             ps.setString(1, c.getNome());
@@ -36,13 +36,13 @@ public class CategoriaDAO {
         } catch (SQLException e) {
             throw new RuntimeException("Erro ao atualizar categoria: " + e.getMessage(), e);
         } finally {
-            ConnectionFactory.closeConnection(conn);
+            ConexaoDB.closeConnection(conn);
         }
     }
 
     public void excluir(int id) {
         String sql = "DELETE FROM categoria WHERE id = ?";
-        Connection conn = ConnectionFactory.getConnection();
+        Connection conn = ConexaoDB.getConnection();
         try {
             PreparedStatement ps = conn.prepareStatement(sql);
             ps.setInt(1, id);
@@ -50,14 +50,14 @@ public class CategoriaDAO {
         } catch (SQLException e) {
             throw new RuntimeException("Erro ao excluir categoria: " + e.getMessage(), e);
         } finally {
-            ConnectionFactory.closeConnection(conn);
+            ConexaoDB.closeConnection(conn);
         }
     }
 
     public List<Categoria> listarTodos() {
         List<Categoria> lista = new ArrayList<>();
         String sql = "SELECT * FROM categoria ORDER BY nome";
-        Connection conn = ConnectionFactory.getConnection();
+        Connection conn = ConexaoDB.getConnection();
         try {
             PreparedStatement ps = conn.prepareStatement(sql);
             ResultSet rs = ps.executeQuery();
@@ -72,14 +72,14 @@ public class CategoriaDAO {
         } catch (SQLException e) {
             throw new RuntimeException("Erro ao listar categorias: " + e.getMessage(), e);
         } finally {
-            ConnectionFactory.closeConnection(conn);
+            ConexaoDB.closeConnection(conn);
         }
         return lista;
     }
 
     public Categoria buscarPorId(int id) {
         String sql = "SELECT * FROM categoria WHERE id = ?";
-        Connection conn = ConnectionFactory.getConnection();
+        Connection conn = ConexaoDB.getConnection();
         try {
             PreparedStatement ps = conn.prepareStatement(sql);
             ps.setInt(1, id);
@@ -95,7 +95,7 @@ public class CategoriaDAO {
         } catch (SQLException e) {
             throw new RuntimeException("Erro ao buscar categoria: " + e.getMessage(), e);
         } finally {
-            ConnectionFactory.closeConnection(conn);
+            ConexaoDB.closeConnection(conn);
         }
         return null;
     }

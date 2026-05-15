@@ -11,7 +11,7 @@ public class MovimentacaoDAO {
 
     public void inserir(Movimentacao m) {
         String sql = "INSERT INTO movimentacao (produto_id, data, quantidade, tipo) VALUES (?, ?, ?, ?)";
-        Connection conn = ConnectionFactory.getConnection();
+        Connection conn = ConexaoDB.getConnection();
         try {
             PreparedStatement ps = conn.prepareStatement(sql);
             ps.setInt(1, m.getProduto().getId());
@@ -25,7 +25,7 @@ public class MovimentacaoDAO {
         } catch (SQLException e) {
             throw new RuntimeException("Erro ao inserir movimentação: " + e.getMessage(), e);
         } finally {
-            ConnectionFactory.closeConnection(conn);
+            ConexaoDB.closeConnection(conn);
         }
     }
 
@@ -47,7 +47,7 @@ public class MovimentacaoDAO {
                    + "JOIN produto p ON m.produto_id = p.id "
                    + "JOIN categoria c ON p.categoria_id = c.id "
                    + "ORDER BY m.data DESC";
-        Connection conn = ConnectionFactory.getConnection();
+        Connection conn = ConexaoDB.getConnection();
         try {
             PreparedStatement ps = conn.prepareStatement(sql);
             ResultSet rs = ps.executeQuery();
@@ -80,7 +80,7 @@ public class MovimentacaoDAO {
         } catch (SQLException e) {
             throw new RuntimeException("Erro ao listar movimentações: " + e.getMessage(), e);
         } finally {
-            ConnectionFactory.closeConnection(conn);
+            ConexaoDB.closeConnection(conn);
         }
         return lista;
     }

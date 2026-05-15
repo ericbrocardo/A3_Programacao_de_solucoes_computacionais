@@ -11,7 +11,7 @@ public class ProdutoDAO {
     public void inserir(Produto p) {
         String sql = "INSERT INTO produto (nome, preco, unidade, qtd_estoque, qtd_minima, qtd_maxima, categoria_id) "
                    + "VALUES (?, ?, ?, ?, ?, ?, ?)";
-        Connection conn = ConnectionFactory.getConnection();
+        Connection conn = ConexaoDB.getConnection();
         try {
             PreparedStatement ps = conn.prepareStatement(sql);
             ps.setString(1, p.getNome());
@@ -25,7 +25,7 @@ public class ProdutoDAO {
         } catch (SQLException e) {
             throw new RuntimeException("Erro ao inserir produto: " + e.getMessage(), e);
         } finally {
-            ConnectionFactory.closeConnection(conn);
+            ConexaoDB.closeConnection(conn);
         }
     }
 
@@ -33,7 +33,7 @@ public class ProdutoDAO {
         String sql = "UPDATE produto SET nome = ?, preco = ?, unidade = ?, "
                    + "qtd_estoque = ?, qtd_minima = ?, qtd_maxima = ?, categoria_id = ? "
                    + "WHERE id = ?";
-        Connection conn = ConnectionFactory.getConnection();
+        Connection conn = ConexaoDB.getConnection();
         try {
             PreparedStatement ps = conn.prepareStatement(sql);
             ps.setString(1, p.getNome());
@@ -48,13 +48,13 @@ public class ProdutoDAO {
         } catch (SQLException e) {
             throw new RuntimeException("Erro ao atualizar produto: " + e.getMessage(), e);
         } finally {
-            ConnectionFactory.closeConnection(conn);
+            ConexaoDB.closeConnection(conn);
         }
     }
 
     public void excluir(int id) {
         String sql = "DELETE FROM produto WHERE id = ?";
-        Connection conn = ConnectionFactory.getConnection();
+        Connection conn = ConexaoDB.getConnection();
         try {
             PreparedStatement ps = conn.prepareStatement(sql);
             ps.setInt(1, id);
@@ -62,7 +62,7 @@ public class ProdutoDAO {
         } catch (SQLException e) {
             throw new RuntimeException("Erro ao excluir produto: " + e.getMessage(), e);
         } finally {
-            ConnectionFactory.closeConnection(conn);
+            ConexaoDB.closeConnection(conn);
         }
     }
 
@@ -71,7 +71,7 @@ public class ProdutoDAO {
         String sql = "SELECT p.*, c.nome AS nome_cat, c.tamanho, c.embalagem "
                    + "FROM produto p JOIN categoria c ON p.categoria_id = c.id "
                    + "ORDER BY p.nome";
-        Connection conn = ConnectionFactory.getConnection();
+        Connection conn = ConexaoDB.getConnection();
         try {
             PreparedStatement ps = conn.prepareStatement(sql);
             ResultSet rs = ps.executeQuery();
@@ -97,7 +97,7 @@ public class ProdutoDAO {
         } catch (SQLException e) {
             throw new RuntimeException("Erro ao listar produtos: " + e.getMessage(), e);
         } finally {
-            ConnectionFactory.closeConnection(conn);
+            ConexaoDB.closeConnection(conn);
         }
         return lista;
     }
@@ -106,7 +106,7 @@ public class ProdutoDAO {
         String sql = "SELECT p.*, c.nome AS nome_cat, c.tamanho, c.embalagem "
                    + "FROM produto p JOIN categoria c ON p.categoria_id = c.id "
                    + "WHERE p.id = ?";
-        Connection conn = ConnectionFactory.getConnection();
+        Connection conn = ConexaoDB.getConnection();
         try {
             PreparedStatement ps = conn.prepareStatement(sql);
             ps.setInt(1, id);
@@ -132,7 +132,7 @@ public class ProdutoDAO {
         } catch (SQLException e) {
             throw new RuntimeException("Erro ao buscar produto: " + e.getMessage(), e);
         } finally {
-            ConnectionFactory.closeConnection(conn);
+            ConexaoDB.closeConnection(conn);
         }
         return null;
     }
