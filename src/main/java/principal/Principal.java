@@ -1,9 +1,30 @@
 package principal;
 
+import dao.ConexaoDB;
+import visao.FrmMenuPrincipal;
+
+import javax.swing.*;
+import java.sql.SQLException;
 
 public class Principal {
 
     public static void main(String[] args) {
-        System.out.println("Alo Mundo");
+        // Testa conexão com o banco ao iniciar
+        try {
+            ConexaoDB.getConnection();
+            System.out.println("Conexão com o banco estabelecida!");
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(null,
+                "Erro ao conectar com o banco de dados:\n" + e.getMessage(),
+                "Erro de Conexão", JOptionPane.ERROR_MESSAGE);
+            System.exit(1);
+        }
+
+        // Inicia a interface gráfica
+        SwingUtilities.invokeLater(() -> {
+            FrmMenuPrincipal tela = new FrmMenuPrincipal();
+            tela.setLocationRelativeTo(null);
+            tela.setVisible(true);
+        });
     }
 }
