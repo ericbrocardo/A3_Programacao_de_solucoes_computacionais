@@ -177,3 +177,106 @@ public class FrmRelatorio extends JFrame {
         painelConteudo.revalidate();
         painelConteudo.repaint();
     }
+
+    // ─────────────────────────────────────────────
+    // Relatório 3 — Abaixo do mínimo
+    // ─────────────────────────────────────────────
+    private void relAbaixoMinimo() {
+        lblTitulo.setText("⚠ Produtos abaixo da quantidade mínima");
+        lblRodape.setText("");
+
+        DefaultTableModel m = new DefaultTableModel(
+            new String[]{"Nome", "Qtd. Mínima", "Qtd. em Estoque"}, 0) {
+            @Override public boolean isCellEditable(int r, int c) { return false; }
+        };
+
+        try {
+            List<Produto> lista = produtoDAO.listarTodos().stream()
+                .filter(p -> p.getQtdEstoque() < p.getQtdMinima())
+                .toList();
+
+            for (Produto p : lista) {
+                m.addRow(new Object[]{
+                    p.getNome(),
+                    p.getQtdMinima(),
+                    p.getQtdEstoque()
+                });
+            }
+        } catch (SQLException e) {
+            Mensagem.erro("Erro: " + e.getMessage());
+        }
+
+        // Destaca quantidade em estoque de vermelho
+        JTable tabela = criarTabela(m, new int[]{300, 120, 140});
+        tabela.getColumnModel().getColumn(2).setCellRenderer(
+            (t, value, isSelected, hasFocus, row, col) -> {
+                JLabel lbl = new JLabel(value != null ? value.toString() : "");
+                lbl.setOpaque(true);
+                lbl.setHorizontalAlignment(SwingConstants.CENTER);
+                if (isSelected) {
+                    lbl.setBackground(t.getSelectionBackground());
+                    lbl.setForeground(Color.WHITE);
+                } else {
+                    lbl.setBackground(Color.WHITE);
+                    lbl.setForeground(new Color(192, 57, 43));
+                    lbl.setFont(lbl.getFont().deriveFont(Font.BOLD));
+                }
+                return lbl;
+            }
+        );
+
+        if (m.getRowCount() == 0) {
+            exibirMensagem("✅ Nenhum produto abaixo do estoque mínimo.");
+        } else {
+            painelConteudo.removeAll();
+            painelConteudo.add(new JScrollPane(tabela), BorderLayout.CENTER);
+            painelConteudo.revalidate();
+            painelConteudo.repaint();
+        }
+    }
+
+    // ─────────────────────────────────────────────
+    // Relatório 4 — Produtos por categoria
+    // ─────────────────────────────────────────────
+    private void relPorCategoria() {
+        lblTitulo.setText("🏷 Quantidade de produtos distintos por categoria");
+        lblRodape.setText("");
+
+        DefaultTableModel m = new DefaultTableModel(
+            new String[]{"Categoria", "Qtd. de Produtos"}, 0) {
+            @Override public boolean isCellEditable(int r, int c) { return false; }
+        };
+
+        try {
+            List<Produto>   produtos    = produtoDAO.listarTodos();
+            List<Categoria> categorias  = categoriaDAO.listarTodas();
+
+            for (Categoria cat : categorias) {
+                long count = produtos.stream()
+                    .filter(p -> p.getCategoria() != null
+                            && p.getCategoria().getId() == cat.getId())
+                    .count();
+                if (count > 0) {
+                    m.addRow(new Object[]{ cat.getNome(), count });
+                }
+            }
+        } catch (SQLException e) {
+            Mensagem.erro("Erro: " + e.getMessage());
+        }
+
+        if (m.getRowCount() == 0) {
+            exibirMensagem("Nenhuma categoria com produtos cadastrados.");
+        } else {
+            exibirTabela(m, new int[]{400, 200});
+        }
+    }
+
+    private void exibirMensagem(String msg) {
+        painelConteudo.removeAll();
+        JLabel lbl = new JLabel(msg, SwingConstants.CENTER);
+        lbl.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        lbl.setForeground(new Color(100, 100, 100));
+        painelConteudo.add(lbl, BorderLayout.CENTER);
+        painelConteudo.revalidate();
+        painelConteudo.repaint();
+    }
