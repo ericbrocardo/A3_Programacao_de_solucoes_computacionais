@@ -204,3 +204,17 @@ import java.util.List;
             Mensagem.erro("Erro ao buscar categoria: " + e.getMessage());
         }
     }
+
+    private void carregarTabela() {
+        modelo.setRowCount(0);
+        try {
+            List<Categoria> lista = dao.listarTodas();
+            for (Categoria c : lista) {
+                modelo.addRow(new Object[]{
+                    c.getId(), c.getNome(), c.getTamanho(), c.getEmbalagem()
+                });
+            }
+        } catch (SQLException e) {
+            Mensagem.erro("Erro ao carregar categorias: " + e.getMessage());
+        }
+    }
