@@ -14,9 +14,9 @@ import java.util.List;
 
 public class FrmRelatorio extends JFrame {
 
-    private JPanel    painelConteudo;
-    private JLabel    lblTitulo;
-    private JLabel    lblRodape;
+    private JPanel     painelConteudo;
+    private JLabel     lblTitulo;
+    private JLabel     lblRodape;
 
     private final ProdutoDAO      produtoDAO   = new ProdutoDAO();
     private final CategoriaDAO    categoriaDAO = new CategoriaDAO();
@@ -85,23 +85,6 @@ public class FrmRelatorio extends JFrame {
         add(lblRodape, BorderLayout.SOUTH);
     }
 
-    private void estilizarBotao(JButton btn, Color cor) {
-        btn.setBackground(cor);
-        btn.setForeground(Color.WHITE);
-        btn.setFocusPainted(false);
-        btn.setBorderPainted(false);
-        btn.setFont(new Font("Segoe UI", Font.BOLD, 11));
-        btn.setCursor(new Cursor(Cursor.HAND_CURSOR));
-    }
-
-    // Métodos vazios para compilação inicial
-    private void relListaPrecos() {}
-    private void relBalanco() {}
-    private void relAbaixoMinimo() {}
-    private void relPorCategoria() {}
-    private void relMaisMovimentados() {}
-}
-
     // ─────────────────────────────────────────────
     // Relatório 1 — Lista de Preços
     // ─────────────────────────────────────────────
@@ -159,23 +142,6 @@ public class FrmRelatorio extends JFrame {
 
         lblRodape.setText(String.format("Valor total do estoque: R$ %.2f", totalGeral));
         exibirTabela(m, new int[]{260, 110, 110, 120});
-    }
-
-    private JTable criarTabela(DefaultTableModel m, int[] larguras) {
-        JTable tabela = new JTable(m);
-        tabela.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        tabela.setRowHeight(26);
-        for (int i = 0; i < larguras.length; i++) {
-            tabela.getColumnModel().getColumn(i).setPreferredWidth(larguras[i]);
-        }
-        return tabela;
-    }
-
-    private void exibirTabela(DefaultTableModel m, int[] larguras) {
-        painelConteudo.removeAll();
-        painelConteudo.add(new JScrollPane(criarTabela(m, larguras)), BorderLayout.CENTER);
-        painelConteudo.revalidate();
-        painelConteudo.repaint();
     }
 
     // ─────────────────────────────────────────────
@@ -271,6 +237,72 @@ public class FrmRelatorio extends JFrame {
         }
     }
 
+    // ─────────────────────────────────────────────
+    // Relatório 5 — Mais entrada e mais saída
+    // ─────────────────────────────────────────────
+    private void relMaisMovimentados() {
+        lblTitulo.setText("🔝 Produto com mais entradas e mais saídas");
+        lblRodape.setText("");
+
+        try {
+            String maisEntrada = movDAO.produtoMaisEntrada();
+            String maisSaida   = movDAO.produtoMaisSaida();
+
+            JPanel painel = new JPanel(new GridLayout(2, 1, 0, 16));
+            painel.setBackground(Color.WHITE);
+            painel.setBorder(BorderFactory.createEmptyBorder(30, 60, 30, 60));
+
+            painel.add(criarCartao("📥 Produto com Mais Entradas", maisEntrada, new Color(39, 174, 96)));
+            painel.add(criarCartao("📤 Produto com Mais Saídas",   maisSaida,   new Color(192, 57, 43)));
+
+            painelConteudo.removeAll();
+            painelConteudo.add(painel, BorderLayout.CENTER);
+            painelConteudo.revalidate();
+            painelConteudo.repaint();
+
+        } catch (SQLException e) {
+            Mensagem.erro("Erro: " + e.getMessage());
+        }
+    }
+
+    // ─────────────────────────────────────────────
+    // Helpers
+    // ─────────────────────────────────────────────
+    private JPanel criarCartao(String titulo, String valor, Color cor) {
+        JPanel card = new JPanel(new GridLayout(2, 1));
+        card.setBackground(cor);
+        card.setBorder(BorderFactory.createEmptyBorder(16, 24, 16, 24));
+
+        JLabel lblTitulo = new JLabel(titulo, SwingConstants.CENTER);
+        lblTitulo.setFont(new Font("Segoe UI", Font.PLAIN, 13));
+        lblTitulo.setForeground(Color.WHITE);
+
+        JLabel lblValor = new JLabel(valor, SwingConstants.CENTER);
+        lblValor.setFont(new Font("Segoe UI", Font.BOLD, 20));
+        lblValor.setForeground(Color.WHITE);
+
+        card.add(lblTitulo);
+        card.add(lblValor);
+        return card;
+    }
+
+    private JTable criarTabela(DefaultTableModel m, int[] larguras) {
+        JTable tabela = new JTable(m);
+        tabela.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        tabela.setRowHeight(26);
+        for (int i = 0; i < larguras.length; i++) {
+            tabela.getColumnModel().getColumn(i).setPreferredWidth(larguras[i]);
+        }
+        return tabela;
+    }
+
+    private void exibirTabela(DefaultTableModel m, int[] larguras) {
+        painelConteudo.removeAll();
+        painelConteudo.add(new JScrollPane(criarTabela(m, larguras)), BorderLayout.CENTER);
+        painelConteudo.revalidate();
+        painelConteudo.repaint();
+    }
+
     private void exibirMensagem(String msg) {
         painelConteudo.removeAll();
         JLabel lbl = new JLabel(msg, SwingConstants.CENTER);
@@ -280,3 +312,13 @@ public class FrmRelatorio extends JFrame {
         painelConteudo.revalidate();
         painelConteudo.repaint();
     }
+
+    private void estilizarBotao(JButton btn, Color cor) {
+        btn.setBackground(cor);
+        btn.setForeground(Color.WHITE);
+        btn.setFocusPainted(false);
+        btn.setBorderPainted(false);
+        btn.setFont(new Font("Segoe UI", Font.BOLD, 11));
+        btn.setCursor(new Cursor(Cursor.HAND_CURSOR));
+    }
+}
