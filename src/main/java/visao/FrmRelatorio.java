@@ -101,3 +101,79 @@ public class FrmRelatorio extends JFrame {
     private void relPorCategoria() {}
     private void relMaisMovimentados() {}
 }
+
+    // ─────────────────────────────────────────────
+    // Relatório 1 — Lista de Preços
+    // ─────────────────────────────────────────────
+    private void relListaPrecos() {
+        lblTitulo.setText("📋 Lista de Preços — produtos em ordem alfabética");
+        lblRodape.setText("");
+
+        DefaultTableModel m = new DefaultTableModel(
+            new String[]{"Nome", "Preço Unitário", "Unidade", "Categoria"}, 0) {
+            @Override public boolean isCellEditable(int r, int c) { return false; }
+        };
+
+        try {
+            for (Produto p : produtoDAO.listarTodos()) {
+                m.addRow(new Object[]{
+                    p.getNome(),
+                    String.format("R$ %.2f", p.getPreco()),
+                    p.getUnidade(),
+                    p.getCategoria() != null ? p.getCategoria().getNome() : ""
+                });
+            }
+        } catch (SQLException e) {
+            Mensagem.erro("Erro: " + e.getMessage());
+        }
+
+        exibirTabela(m, new int[]{280, 120, 80, 160});
+    }
+
+    // ─────────────────────────────────────────────
+    // Relatório 2 — Balanço Físico/Financeiro
+    // ─────────────────────────────────────────────
+    private void relBalanco() {
+        lblTitulo.setText("⚖ Balanço Físico/Financeiro");
+
+        DefaultTableModel m = new DefaultTableModel(
+            new String[]{"Nome", "Qtd. Estoque", "Preço Unit.", "Valor Total"}, 0) {
+            @Override public boolean isCellEditable(int r, int c) { return false; }
+        };
+
+        double totalGeral = 0;
+        try {
+            for (Produto p : produtoDAO.listarTodos()) {
+                double total = p.getPreco() * p.getQtdEstoque();
+                totalGeral += total;
+                m.addRow(new Object[]{
+                    p.getNome(),
+                    p.getQtdEstoque(),
+                    String.format("R$ %.2f", p.getPreco()),
+                    String.format("R$ %.2f", total)
+                });
+            }
+        } catch (SQLException e) {
+            Mensagem.erro("Erro: " + e.getMessage());
+        }
+
+        lblRodape.setText(String.format("Valor total do estoque: R$ %.2f", totalGeral));
+        exibirTabela(m, new int[]{260, 110, 110, 120});
+    }
+
+    private JTable criarTabela(DefaultTableModel m, int[] larguras) {
+        JTable tabela = new JTable(m);
+        tabela.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        tabela.setRowHeight(26);
+        for (int i = 0; i < larguras.length; i++) {
+            tabela.getColumnModel().getColumn(i).setPreferredWidth(larguras[i]);
+        }
+        return tabela;
+    }
+
+    private void exibirTabela(DefaultTableModel m, int[] larguras) {
+        painelConteudo.removeAll();
+        painelConteudo.add(new JScrollPane(criarTabela(m, larguras)), BorderLayout.CENTER);
+        painelConteudo.revalidate();
+        painelConteudo.repaint();
+    }
