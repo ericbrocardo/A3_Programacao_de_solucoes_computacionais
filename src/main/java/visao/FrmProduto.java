@@ -124,6 +124,7 @@ import java.util.List;
             estilizarBotao(btnExcluir, new Color(231, 76, 60));
 
             btnSalvar.addActionListener(e -> salvar());
+            btnExcluir.addActionListener(e -> excluir());
             btnLimpar.addActionListener(e -> limpar());
 
             pnlBotoes.add(btnSalvar);
@@ -255,5 +256,22 @@ import java.util.List;
             carregarTabela();
         } catch (SQLException e) {
             Mensagem.erro("Erro ao salvar: " + e.getMessage());
+        }
+    }
+
+    private void excluir() {
+        if (produtoSelecionado == null) {
+            Mensagem.aviso("Selecione um produto para excluir.");
+            return;
+        }
+        if (Mensagem.confirmar("Deseja excluir o produto \"" + produtoSelecionado.getNome() + "\"?")) {
+            try {
+                produtoDAO.excluir(produtoSelecionado.getId());
+                Mensagem.info("Produto excluído com sucesso!");
+                limpar();
+                carregarTabela();
+            } catch (SQLException e) {
+                Mensagem.erro("Erro ao excluir: " + e.getMessage());
+            }
         }
     }
