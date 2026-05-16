@@ -16,6 +16,8 @@ public class FrmProduto extends JFrame {
     private JTextField txtNome, txtUnidade, txtPreco;
     private JTextField txtQtdEstoque, txtQtdMinima, txtQtdMaxima;
     private JComboBox<Categoria> cmbCategoria;
+    private JTable tabela;
+    private DefaultTableModel modelo;
 
     private final ProdutoDAO produtoDAO = new ProdutoDAO();
     private final CategoriaDAO categoriaDAO = new CategoriaDAO();
@@ -106,5 +108,21 @@ public class FrmProduto extends JFrame {
         pnlForm.add(txtQtdMaxima, gbc);
 
         add(pnlForm, BorderLayout.NORTH);
+
+        // ── Tabela ──────────────────────────────────
+        modelo = new DefaultTableModel(
+            new String[]{"ID", "Nome", "Preço", "Unidade", "Estoque", "Mínimo", "Máximo", "Categoria"}, 0) {
+            @Override
+            public boolean isCellEditable(int r, int c) {
+                return false;
+            }
+        };
+
+        tabela = new JTable(modelo);
+        tabela.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        tabela.setRowHeight(24);
+        tabela.getColumnModel().getColumn(0).setMaxWidth(45);
+
+        add(new JScrollPane(tabela), BorderLayout.CENTER);
     }
 }
