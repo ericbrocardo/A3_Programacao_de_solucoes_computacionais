@@ -150,6 +150,7 @@ import java.util.List;
             tabela.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
             tabela.setRowHeight(24);
             tabela.getColumnModel().getColumn(0).setMaxWidth(45);
+            tabela.getSelectionModel().addListSelectionListener(e -> selecionarLinha());
 
             add(new JScrollPane(tabela), BorderLayout.CENTER);
         }
@@ -273,5 +274,27 @@ import java.util.List;
             } catch (SQLException e) {
                 Mensagem.erro("Erro ao excluir: " + e.getMessage());
             }
+        }
+    }
+
+    private void selecionarLinha() {
+        int linha = tabela.getSelectedRow();
+        if (linha < 0) {
+            return;
+        }
+        int id = (int) modelo.getValueAt(linha, 0);
+        try {
+            produtoSelecionado = produtoDAO.buscarPorId(id);
+            if (produtoSelecionado != null) {
+                txtNome.setText(produtoSelecionado.getNome());
+                txtUnidade.setText(produtoSelecionado.getUnidade());
+                txtPreco.setText(String.valueOf(produtoSelecionado.getPreco()));
+                txtQtdEstoque.setText(String.valueOf(produtoSelecionado.getQtdEstoque()));
+                txtQtdMinima.setText(String.valueOf(produtoSelecionado.getQtdMinima()));
+                txtQtdMaxima.setText(String.valueOf(produtoSelecionado.getQtdMaxima()));
+                cmbCategoria.setSelectedItem(produtoSelecionado.getCategoria());
+            }
+        } catch (SQLException e) {
+            Mensagem.erro("Erro ao buscar produto: " + e.getMessage());
         }
     }
