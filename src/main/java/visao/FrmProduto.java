@@ -160,3 +160,15 @@ import java.util.List;
         btn.setCursor(new Cursor(Cursor.HAND_CURSOR));
         btn.setPreferredSize(new Dimension(100, 32));
     }
+
+    private void carregarCategorias() {
+        try {
+            List<Categoria> lista = categoriaDAO.listarTodas();
+            for (Categoria c : lista) {
+                cmbCategoria.addItem(c);
+            }
+            cmbCategoria.setSelectedIndex(-1);
+        } catch (SQLException e) {
+            Mensagem.erro("Erro ao carregar categorias: " + e.getMessage());
+        }
+    }
