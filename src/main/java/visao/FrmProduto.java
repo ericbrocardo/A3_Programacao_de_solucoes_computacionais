@@ -172,3 +172,24 @@ import java.util.List;
             Mensagem.erro("Erro ao carregar categorias: " + e.getMessage());
         }
     }
+
+    private void carregarTabela() {
+        modelo.setRowCount(0);
+        try {
+            List<Produto> lista = produtoDAO.listarTodos();
+            for (Produto p : lista) {
+                modelo.addRow(new Object[]{
+                    p.getId(),
+                    p.getNome(),
+                    String.format("R$ %.2f", p.getPreco()),
+                    p.getUnidade(),
+                    p.getQtdEstoque(),
+                    p.getQtdMinima(),
+                    p.getQtdMaxima(),
+                    p.getCategoria() != null ? p.getCategoria().getNome() : ""
+                });
+            }
+        } catch (SQLException e) {
+            Mensagem.erro("Erro ao carregar produtos: " + e.getMessage());
+        }
+    }
