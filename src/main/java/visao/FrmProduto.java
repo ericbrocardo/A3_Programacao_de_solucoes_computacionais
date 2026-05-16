@@ -123,6 +123,7 @@ import java.util.List;
             estilizarBotao(btnLimpar, new Color(149, 165, 166));
             estilizarBotao(btnExcluir, new Color(231, 76, 60));
 
+            btnSalvar.addActionListener(e -> salvar());
             btnLimpar.addActionListener(e -> limpar());
 
             pnlBotoes.add(btnSalvar);
@@ -206,4 +207,53 @@ import java.util.List;
         cmbCategoria.setSelectedIndex(-1);
         tabela.clearSelection();
         produtoSelecionado = null;
+    }
+
+    private void salvar() {
+        String nome = txtNome.getText().trim();
+        String unidade = txtUnidade.getText().trim();
+        Categoria cat = (Categoria) cmbCategoria.getSelectedItem();
+
+        if (nome.isEmpty() || unidade.isEmpty() || cat == null
+                || txtPreco.getText().trim().isEmpty()
+                || txtQtdEstoque.getText().trim().isEmpty()
+                || txtQtdMinima.getText().trim().isEmpty()
+                || txtQtdMaxima.getText().trim().isEmpty()) {
+            Mensagem.aviso("Preencha todos os campos.");
+            return;
+        }
+
+        double preco, estoque, minima, maxima;
+        try {
+            preco = Double.parseDouble(txtPreco.getText().trim().replace(",", "."));
+            estoque = Double.parseDouble(txtQtdEstoque.getText().trim().replace(",", "."));
+            minima = Double.parseDouble(txtQtdMinima.getText().trim().replace(",", "."));
+            maxima = Double.parseDouble(txtQtdMaxima.getText().trim().replace(",", "."));
+        } catch (NumberFormatException e) {
+            Mensagem.erro("Valores numéricos inválidos. Use ponto como separador decimal.");
+            return;
+        }
+
+        if (minima >= maxima) {
+            Mensagem.aviso("A quantidade mínima deve ser menor que a máxima.");
+            return;
+        }
+
+        try {
+            Produto p = new Produto(
+                    produtoSelecionado != null ? produtoSelecionado.getId() : 0,
+                    nome, preco, unidade, estoque, minima, maxima, cat
+            );
+            if (produtoSelecionado == null) {
+                produtoDAO.inserir(p);
+                Mensagem.info("Produto cadastrado com sucesso!");
+            } else {
+                produtoDAO.atualizar(p);
+                Mensagem.info("Produto atualizado com sucesso!");
+            }
+            limpar();
+            carregarTabela();
+        } catch (SQLException e) {
+            Mensagem.erro("Erro ao salvar: " + e.getMessage());
+        }
     }
