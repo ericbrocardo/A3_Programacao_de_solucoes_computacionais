@@ -123,6 +123,8 @@ import java.util.List;
             estilizarBotao(btnLimpar, new Color(149, 165, 166));
             estilizarBotao(btnExcluir, new Color(231, 76, 60));
 
+            btnLimpar.addActionListener(e -> limpar());
+
             pnlBotoes.add(btnSalvar);
             pnlBotoes.add(btnLimpar);
             pnlBotoes.add(btnExcluir);
@@ -192,4 +194,16 @@ import java.util.List;
         } catch (SQLException e) {
             Mensagem.erro("Erro ao carregar produtos: " + e.getMessage());
         }
+    }
+
+    private void limpar() {
+        txtNome.setText("");
+        txtUnidade.setText("");
+        txtPreco.setText("");
+        txtQtdEstoque.setText("");
+        txtQtdMinima.setText("");
+        txtQtdMaxima.setText("");
+        cmbCategoria.setSelectedIndex(-1);
+        tabela.clearSelection();
+        produtoSelecionado = null;
     }
