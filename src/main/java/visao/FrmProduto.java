@@ -123,6 +123,7 @@ public class FrmProduto extends JFrame {
 
         modelo = new DefaultTableModel(
                 new String[]{"ID", "Nome", "Preço", "Unidade", "Estoque", "Mínimo", "Máximo", "Categoria"}, 0) {
+            @Override
             public boolean isCellEditable(int r, int c) {
                 return false;
             }
@@ -130,7 +131,11 @@ public class FrmProduto extends JFrame {
 
         tabela = new JTable(modelo);
         tabela.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        tabela.getSelectionModel().addListSelectionListener(e -> selecionarLinha());
+        tabela.getSelectionModel().addListSelectionListener(e -> {
+            if (!e.getValueIsAdjusting()) {
+                selecionarLinha();
+            }
+        });
 
         add(new JScrollPane(tabela), BorderLayout.CENTER);
     }
@@ -159,21 +164,50 @@ public class FrmProduto extends JFrame {
             limpar();
             carregarTabela();
 
+        } catch (NumberFormatException e) {
+            Mensagem.erro("Preencha os campos numéricos corretamente.");
         } catch (Exception e) {
             Mensagem.erro("Erro: " + e.getMessage());
         }
     }
 
     private void excluir() {
-        if (produtoSelecionado == null) return;
+        if (produtoSelecionado == null) {
+            Mensagem.erro("Selecione um produto para excluir.");
+            return;
+        }
+
+        int confirmacao = JOptionPane.showConfirmDialog(
+                this,
+                "Deseja realmente excluir este produto?",
+                "Confirmar exclusão",
+                JOptionPane.YES_NO_OPTION
+        );
+
+        if (confirmacao != JOptionPane.YES_OPTION) {
+            return;
+        }
 
         try {
             produtoDAO.excluir(produtoSelecionado.getId());
+
             Mensagem.info("Produto excluído!");
             limpar();
             carregarTabela();
+
         } catch (Exception e) {
-            Mensagem.erro("Erro: " + e.getMessage());
+            String erro = e.getMessage();
+
+            if (erro != null && (
+                    erro.contains("foreign key constraint fails")
+                            || erro.contains("Cannot delete or update a parent row")
+                            || erro.contains("movimentacao")
+                            || erro.contains("produto_id")
+            )) {
+                Mensagem.erro("Não é possível excluir este produto, pois ele possui movimentações cadastradas.");
+            } else {
+                Mensagem.erro("Erro ao excluir produto: " + erro);
+            }
         }
     }
 
@@ -184,13 +218,21 @@ public class FrmProduto extends JFrame {
         txtQtdEstoque.setText("");
         txtQtdMinima.setText("");
         txtQtdMaxima.setText("");
-        cmbCategoria.setSelectedIndex(-1);
+
+        if (cmbCategoria.getItemCount() > 0) {
+            cmbCategoria.setSelectedIndex(-1);
+        }
+
         produtoSelecionado = null;
+        tabela.clearSelection();
     }
 
     private void selecionarLinha() {
         int linha = tabela.getSelectedRow();
-        if (linha < 0) return;
+
+        if (linha < 0) {
+            return;
+        }
 
         try {
             int id = (int) modelo.getValueAt(linha, 0);
@@ -214,6 +256,7 @@ public class FrmProduto extends JFrame {
 
         try {
             List<Produto> lista = produtoDAO.listarTodos();
+
             for (Produto p : lista) {
                 modelo.addRow(new Object[]{
                         p.getId(),
@@ -226,6 +269,7 @@ public class FrmProduto extends JFrame {
                         p.getCategoria() != null ? p.getCategoria().getNome() : ""
                 });
             }
+
         } catch (Exception e) {
             Mensagem.erro("Erro: " + e.getMessage());
         }
@@ -233,10 +277,16 @@ public class FrmProduto extends JFrame {
 
     private void carregarCategorias() {
         try {
+            cmbCategoria.removeAllItems();
+
             List<Categoria> lista = categoriaDAO.listarTodas();
+
             for (Categoria c : lista) {
                 cmbCategoria.addItem(c);
             }
+
+            cmbCategoria.setSelectedIndex(-1);
+
         } catch (Exception e) {
             Mensagem.erro("Erro ao carregar categorias: " + e.getMessage());
         }
