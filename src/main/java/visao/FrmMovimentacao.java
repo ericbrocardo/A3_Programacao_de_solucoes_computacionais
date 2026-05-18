@@ -9,7 +9,6 @@ import modelo.Produto;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
-import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
@@ -18,14 +17,14 @@ import java.util.List;
 public class FrmMovimentacao extends JFrame {
 
     private JComboBox<Produto> cmbProduto;
-    private JComboBox<Tipo>    cmbTipo;
-    private JTextField         txtData;
-    private JTextField         txtQuantidade;
-    private JTable             tabela;
-    private DefaultTableModel  modelo;
+    private JComboBox<Tipo> cmbTipo;
+    private JTextField txtData;
+    private JTextField txtQuantidade;
+    private JTable tabela;
+    private DefaultTableModel modelo;
 
-    private final MovimentacaoDAO movDAO     = new MovimentacaoDAO();
-    private final ProdutoDAO      produtoDAO = new ProdutoDAO();
+    private final MovimentacaoDAO movDAO = new MovimentacaoDAO();
+    private final ProdutoDAO produtoDAO = new ProdutoDAO();
 
     private static final DateTimeFormatter FORMATO = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
@@ -34,7 +33,6 @@ public class FrmMovimentacao extends JFrame {
         carregarProdutos();
         carregarTabela();
     }
-}
 
     private void initComponents() {
         setTitle("Movimentações de Estoque");
@@ -46,145 +44,118 @@ public class FrmMovimentacao extends JFrame {
         JPanel pnlForm = new JPanel(new GridBagLayout());
         pnlForm.setBorder(BorderFactory.createTitledBorder("Registrar Movimentação"));
         pnlForm.setBackground(Color.WHITE);
+
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(6, 8, 6, 8);
-        gbc.fill   = GridBagConstraints.HORIZONTAL;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
 
         gbc.gridy = 0;
-        gbc.gridx = 0; gbc.weightx = 0;
+        gbc.gridx = 0;
         pnlForm.add(new JLabel("Produto:"), gbc);
-        gbc.gridx = 1; gbc.weightx = 1; gbc.gridwidth = 3;
+
+        gbc.gridx = 1;
+        gbc.gridwidth = 3;
+        gbc.weightx = 1;
         cmbProduto = new JComboBox<>();
         pnlForm.add(cmbProduto, gbc);
-        gbc.gridx = 4; gbc.weightx = 0; gbc.gridwidth = 1;
+
+        gbc.gridx = 4;
+        gbc.gridwidth = 1;
+        gbc.weightx = 0;
         pnlForm.add(new JLabel("Tipo:"), gbc);
-        gbc.gridx = 5; gbc.weightx = 0.4;
+
+        gbc.gridx = 5;
         cmbTipo = new JComboBox<>(Tipo.values());
         cmbTipo.insertItemAt(null, 0);
         cmbTipo.setSelectedIndex(0);
         pnlForm.add(cmbTipo, gbc);
 
-        gbc.gridy = 1; gbc.gridwidth = 1;
-        gbc.gridx = 0; gbc.weightx = 0;
+        gbc.gridy = 1;
+
+        gbc.gridx = 0;
         pnlForm.add(new JLabel("Data (dd/MM/yyyy):"), gbc);
-        gbc.gridx = 1; gbc.weightx = 0.5;
+
+        gbc.gridx = 1;
         txtData = new JTextField(LocalDate.now().format(FORMATO));
         pnlForm.add(txtData, gbc);
-        gbc.gridx = 2; gbc.weightx = 0;
+
+        gbc.gridx = 2;
         pnlForm.add(new JLabel("Quantidade:"), gbc);
-        gbc.gridx = 3; gbc.weightx = 0.5;
+
+        gbc.gridx = 3;
         txtQuantidade = new JTextField();
         pnlForm.add(txtQuantidade, gbc);
 
-        JPanel pnlBotoes = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 0));
-        pnlBotoes.setBackground(Color.WHITE);
+        JPanel pnlBotoes = new JPanel(new FlowLayout(FlowLayout.LEFT));
         JButton btnRegistrar = new JButton("Registrar");
-        JButton btnLimpar    = new JButton("Limpar");
-        estilizarBotao(btnRegistrar, new Color(41, 128, 185));
-        estilizarBotao(btnLimpar,    new Color(149, 165, 166));
+        JButton btnLimpar = new JButton("Limpar");
+
         btnRegistrar.addActionListener(e -> registrar());
         btnLimpar.addActionListener(e -> limpar());
+
         pnlBotoes.add(btnRegistrar);
         pnlBotoes.add(btnLimpar);
-        gbc.gridx = 0; gbc.gridy = 2; gbc.gridwidth = 6; gbc.weightx = 1;
+
+        gbc.gridx = 0;
+        gbc.gridy = 2;
+        gbc.gridwidth = 6;
         pnlForm.add(pnlBotoes, gbc);
+
         add(pnlForm, BorderLayout.NORTH);
 
         modelo = new DefaultTableModel(
-            new String[]{"ID", "Produto", "Tipo", "Quantidade", "Data"}, 0) {
-            @Override public boolean isCellEditable(int r, int c) { return false; }
-        };
-
-        tabela = new JTable(modelo) {
-            @Override
-            public Component prepareRenderer(javax.swing.table.TableCellRenderer r, int row, int col) {
-                Component c = super.prepareRenderer(r, row, col);
-                String tipo = (String) modelo.getValueAt(row, 2);
-                if (!isRowSelected(row)) {
-                    c.setForeground("ENTRADA".equals(tipo)
-                        ? new Color(39, 174, 96) : new Color(231, 76, 60));
-                } else {
-                    c.setForeground(Color.WHITE);
-                }
-                return c;
+                new String[]{"ID", "Produto", "Tipo", "Quantidade", "Data"}, 0) {
+            public boolean isCellEditable(int r, int c) {
+                return false;
             }
         };
-        tabela.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        tabela.setRowHeight(24);
-        tabela.getColumnModel().getColumn(0).setMaxWidth(45);
+
+        tabela = new JTable(modelo);
         add(new JScrollPane(tabela), BorderLayout.CENTER);
     }
 
     private void registrar() {
-        Produto produto  = (Produto) cmbProduto.getSelectedItem();
-        Tipo tipo        = (Tipo)    cmbTipo.getSelectedItem();
-        String dataStr   = txtData.getText().trim();
-        String qtdStr    = txtQuantidade.getText().trim();
+        Produto produto = (Produto) cmbProduto.getSelectedItem();
+        Tipo tipo = (Tipo) cmbTipo.getSelectedItem();
 
-        if (produto == null || tipo == null || dataStr.isEmpty() || qtdStr.isEmpty()) {
+        if (produto == null || tipo == null) {
             Mensagem.aviso("Preencha todos os campos.");
             return;
         }
 
         LocalDate data;
         try {
-            data = LocalDate.parse(dataStr, FORMATO);
+            data = LocalDate.parse(txtData.getText(), FORMATO);
         } catch (DateTimeParseException e) {
-            Mensagem.erro("Data inválida. Use o formato dd/MM/yyyy.");
+            Mensagem.erro("Data inválida.");
             return;
         }
 
         double quantidade;
         try {
-            quantidade = Double.parseDouble(qtdStr.replace(",", "."));
-            if (quantidade <= 0) throw new NumberFormatException();
+            quantidade = Double.parseDouble(txtQuantidade.getText());
         } catch (NumberFormatException e) {
-            Mensagem.erro("Quantidade inválida. Informe um número maior que zero.");
+            Mensagem.erro("Quantidade inválida.");
             return;
         }
 
-        double novoSaldo;
-        if (tipo == Tipo.ENTRADA) {
-            novoSaldo = produto.getQtdEstoque() + quantidade;
-        } else {
-            novoSaldo = produto.getQtdEstoque() - quantidade;
-            if (novoSaldo < 0) {
-                Mensagem.erro("Estoque insuficiente!\nSaldo atual: " + produto.getQtdEstoque());
-                return;
-            }
+        // ❗ valida estoque para saída
+        if (tipo == Tipo.SAIDA && produto.getQtdEstoque() < quantidade) {
+            Mensagem.erro("Estoque insuficiente!");
+            return;
         }
 
         try {
+            // ✔️ DAO já atualiza estoque sozinho
             movDAO.inserir(new Movimentacao(0, produto, data, quantidade, tipo));
-            produtoDAO.atualizarEstoque(produto.getId(), novoSaldo);
 
-            if (tipo == Tipo.SAIDA && novoSaldo < produto.getQtdMinima()) {
-                Mensagem.aviso(
-                    "⚠️ ESTOQUE BAIXO!\n\n" +
-                    "Produto: " + produto.getNome() + "\n" +
-                    "Saldo atual: " + novoSaldo + "\n" +
-                    "Quantidade mínima: " + produto.getQtdMinima() + "\n\n" +
-                    "Providencie a compra deste produto!"
-                );
-            }
-
-            if (tipo == Tipo.ENTRADA && novoSaldo > produto.getQtdMaxima()) {
-                Mensagem.aviso(
-                    "⚠️ ESTOQUE CHEIO!\n\n" +
-                    "Produto: " + produto.getNome() + "\n" +
-                    "Saldo atual: " + novoSaldo + "\n" +
-                    "Quantidade máxima: " + produto.getQtdMaxima() + "\n\n" +
-                    "Não é necessário comprar mais deste produto!"
-                );
-            }
-
-            Mensagem.info("Movimentação registrada com sucesso!");
+            Mensagem.info("Movimentação registrada!");
             limpar();
             carregarProdutos();
             carregarTabela();
 
-        } catch (SQLException e) {
-            Mensagem.erro("Erro ao registrar: " + e.getMessage());
+        } catch (Exception e) {
+            Mensagem.erro("Erro: " + e.getMessage());
         }
     }
 
@@ -197,42 +168,33 @@ public class FrmMovimentacao extends JFrame {
 
     private void carregarTabela() {
         modelo.setRowCount(0);
+
         try {
             List<Movimentacao> lista = movDAO.listarTodas();
             for (Movimentacao m : lista) {
                 modelo.addRow(new Object[]{
-                    m.getId(),
-                    m.getProduto() != null ? m.getProduto().getNome() : "",
-                    m.getTipo().name(),
-                    m.getQuantidade(),
-                    m.getData().format(FORMATO)
+                        m.getId(),
+                        m.getProduto() != null ? m.getProduto().getId() : "",
+                        m.getTipo(),
+                        m.getQuantidade(),
+                        m.getData().format(FORMATO)
                 });
             }
-        } catch (SQLException e) {
-            Mensagem.erro("Erro ao carregar movimentações: " + e.getMessage());
+        } catch (Exception e) {
+            Mensagem.erro("Erro ao carregar: " + e.getMessage());
         }
     }
 
     private void carregarProdutos() {
-        Produto selecionado = (Produto) cmbProduto.getSelectedItem();
         cmbProduto.removeAllItems();
+
         try {
             List<Produto> lista = produtoDAO.listarTodos();
             for (Produto p : lista) {
                 cmbProduto.addItem(p);
             }
-            cmbProduto.setSelectedItem(selecionado);
-        } catch (SQLException e) {
+        } catch (Exception e) {
             Mensagem.erro("Erro ao carregar produtos: " + e.getMessage());
         }
     }
-
-    private void estilizarBotao(JButton btn, Color cor) {
-        btn.setBackground(cor);
-        btn.setForeground(Color.WHITE);
-        btn.setFocusPainted(false);
-        btn.setBorderPainted(false);
-        btn.setFont(new Font("Segoe UI", Font.BOLD, 12));
-        btn.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        btn.setPreferredSize(new Dimension(110, 32));
-    }
+}

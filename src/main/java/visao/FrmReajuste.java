@@ -4,7 +4,6 @@ import dao.ProdutoDAO;
 
 import javax.swing.*;
 import java.awt.*;
-import java.sql.SQLException;
 
 public class FrmReajuste extends JFrame {
 
@@ -16,6 +15,7 @@ public class FrmReajuste extends JFrame {
     public FrmReajuste() {
         initComponents();
     }
+
     private void initComponents() {
         setTitle("Reajuste de Preços");
         setSize(400, 280);
@@ -27,9 +27,10 @@ public class FrmReajuste extends JFrame {
         JPanel pnlCentro = new JPanel(new GridBagLayout());
         pnlCentro.setBackground(Color.WHITE);
         pnlCentro.setBorder(BorderFactory.createEmptyBorder(20, 40, 20, 40));
+
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(8, 8, 8, 8);
-        gbc.fill   = GridBagConstraints.HORIZONTAL;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.gridwidth = 2;
 
         gbc.gridy = 0;
@@ -41,20 +42,27 @@ public class FrmReajuste extends JFrame {
         lblInstrucao.setForeground(new Color(100, 100, 100));
         pnlCentro.add(lblInstrucao, gbc);
 
-        gbc.gridy = 1; gbc.gridwidth = 1;
-        gbc.gridx = 0; gbc.weightx = 1;
+        gbc.gridy = 1;
+        gbc.gridwidth = 1;
+
+        gbc.gridx = 0;
+        gbc.weightx = 1;
         txtPercentual = new JTextField();
         txtPercentual.setFont(new Font("Segoe UI", Font.PLAIN, 16));
         txtPercentual.setHorizontalAlignment(JTextField.CENTER);
         txtPercentual.setPreferredSize(new Dimension(0, 38));
         pnlCentro.add(txtPercentual, gbc);
 
-        gbc.gridx = 1; gbc.weightx = 0;
+        gbc.gridx = 1;
+        gbc.weightx = 0;
         JLabel lblPct = new JLabel("%");
         lblPct.setFont(new Font("Segoe UI", Font.BOLD, 18));
         pnlCentro.add(lblPct, gbc);
 
-        gbc.gridy = 2; gbc.gridx = 0; gbc.gridwidth = 2; gbc.weightx = 1;
+        gbc.gridy = 2;
+        gbc.gridx = 0;
+        gbc.gridwidth = 2;
+
         JButton btnAplicar = new JButton("Aplicar Reajuste");
         estilizarBotao(btnAplicar, new Color(230, 126, 34));
         btnAplicar.setPreferredSize(new Dimension(0, 40));
@@ -68,7 +76,8 @@ public class FrmReajuste extends JFrame {
 
         add(pnlCentro, BorderLayout.CENTER);
     }
-        private void aplicar() {
+
+    private void aplicar() {
         String texto = txtPercentual.getText().trim().replace(",", ".");
 
         if (texto.isEmpty()) {
@@ -101,18 +110,21 @@ public class FrmReajuste extends JFrame {
         if (Mensagem.confirmar(msg)) {
             try {
                 produtoDAO.reajustarPrecos(percentual);
+
                 lblResultado.setForeground(new Color(39, 174, 96));
                 lblResultado.setText(String.format(
                     "✔ Reajuste de %.2f%% aplicado com sucesso!", percentual
                 ));
+
                 txtPercentual.setText("");
-            } catch (SQLException e) {
+
+            } catch (Exception e) { // ✔️ CORRIGIDO AQUI
                 lblResultado.setForeground(new Color(231, 76, 60));
                 lblResultado.setText("Erro: " + e.getMessage());
             }
         }
     }
-        
+
     private void estilizarBotao(JButton btn, Color cor) {
         btn.setBackground(cor);
         btn.setForeground(Color.WHITE);
@@ -121,4 +133,4 @@ public class FrmReajuste extends JFrame {
         btn.setFont(new Font("Segoe UI", Font.BOLD, 13));
         btn.setCursor(new Cursor(Cursor.HAND_CURSOR));
     }
- }
+}

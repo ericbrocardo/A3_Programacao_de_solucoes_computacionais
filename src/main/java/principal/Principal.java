@@ -4,7 +4,6 @@ import dao.ConexaoDB;
 import visao.FrmMenuPrincipal;
 
 import javax.swing.*;
-import java.sql.SQLException;
 
 public class Principal {
 
@@ -13,7 +12,7 @@ public class Principal {
         try {
             ConexaoDB.getConnection();
             System.out.println("Conexão com o banco estabelecida!");
-        } catch (SQLException e) {
+        } catch (Exception e) {
             JOptionPane.showMessageDialog(null,
                 "Erro ao conectar com o banco de dados:\n" + e.getMessage(),
                 "Erro de Conexão", JOptionPane.ERROR_MESSAGE);

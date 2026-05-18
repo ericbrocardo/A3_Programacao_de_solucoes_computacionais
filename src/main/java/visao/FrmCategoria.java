@@ -8,7 +8,6 @@ import modelo.Categoria.Tamanho;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
-import java.sql.SQLException;
 import java.util.List;
 
 public class FrmCategoria extends JFrame {
@@ -34,30 +33,30 @@ public class FrmCategoria extends JFrame {
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLayout(new BorderLayout(0, 10));
 
-        // ── Formulário ──────────────────────────────
         JPanel pnlForm = new JPanel(new GridBagLayout());
         pnlForm.setBorder(BorderFactory.createTitledBorder("Dados da Categoria"));
         pnlForm.setBackground(Color.WHITE);
+
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(6, 8, 6, 8);
         gbc.fill = GridBagConstraints.HORIZONTAL;
 
-        // Nome
         gbc.gridx = 0;
         gbc.gridy = 0;
         pnlForm.add(new JLabel("Nome:"), gbc);
+
         gbc.gridx = 1;
         gbc.gridwidth = 3;
         gbc.weightx = 1;
         txtNome = new JTextField();
         pnlForm.add(txtNome, gbc);
 
-        // Tamanho
         gbc.gridx = 0;
         gbc.gridy = 1;
         gbc.gridwidth = 1;
         gbc.weightx = 0;
         pnlForm.add(new JLabel("Tamanho:"), gbc);
+
         gbc.gridx = 1;
         gbc.weightx = 0.5;
         cmbTamanho = new JComboBox<>(Tamanho.values());
@@ -65,10 +64,10 @@ public class FrmCategoria extends JFrame {
         cmbTamanho.setSelectedIndex(0);
         pnlForm.add(cmbTamanho, gbc);
 
-        // Embalagem
         gbc.gridx = 2;
         gbc.weightx = 0;
         pnlForm.add(new JLabel("Embalagem:"), gbc);
+
         gbc.gridx = 3;
         gbc.weightx = 0.5;
         cmbEmbalagem = new JComboBox<>(Embalagem.values());
@@ -76,7 +75,6 @@ public class FrmCategoria extends JFrame {
         cmbEmbalagem.setSelectedIndex(0);
         pnlForm.add(cmbEmbalagem, gbc);
 
-        // ── Botões ──────────────────────────────────
         JPanel pnlBotoes = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 0));
         pnlBotoes.setBackground(Color.WHITE);
 
@@ -103,7 +101,6 @@ public class FrmCategoria extends JFrame {
 
         add(pnlForm, BorderLayout.NORTH);
 
-        // ── Tabela ──────────────────────────────────
         modelo = new DefaultTableModel(
                 new String[]{"ID", "Nome", "Tamanho", "Embalagem"}, 0) {
             @Override
@@ -144,7 +141,7 @@ public class FrmCategoria extends JFrame {
             }
             limpar();
             carregarTabela();
-        } catch (SQLException e) {
+        } catch (Exception e) {
             Mensagem.erro("Erro ao salvar: " + e.getMessage());
         }
     }
@@ -154,13 +151,14 @@ public class FrmCategoria extends JFrame {
             Mensagem.aviso("Selecione uma categoria para excluir.");
             return;
         }
+
         if (Mensagem.confirmar("Deseja excluir a categoria \"" + categoriaSelecionada.getNome() + "\"?")) {
             try {
                 dao.excluir(categoriaSelecionada.getId());
                 Mensagem.info("Categoria excluída com sucesso!");
                 limpar();
                 carregarTabela();
-            } catch (SQLException e) {
+            } catch (Exception e) {
                 Mensagem.erro("Erro ao excluir: " + e.getMessage());
             }
         }
@@ -176,10 +174,10 @@ public class FrmCategoria extends JFrame {
 
     private void selecionarLinha() {
         int linha = tabela.getSelectedRow();
-        if (linha < 0) {
-            return;
-        }
+        if (linha < 0) return;
+
         int id = (int) modelo.getValueAt(linha, 0);
+
         try {
             categoriaSelecionada = dao.buscarPorId(id);
             if (categoriaSelecionada != null) {
@@ -187,21 +185,25 @@ public class FrmCategoria extends JFrame {
                 cmbTamanho.setSelectedItem(categoriaSelecionada.getTamanho());
                 cmbEmbalagem.setSelectedItem(categoriaSelecionada.getEmbalagem());
             }
-        } catch (SQLException e) {
+        } catch (Exception e) {
             Mensagem.erro("Erro ao buscar categoria: " + e.getMessage());
         }
     }
 
     private void carregarTabela() {
         modelo.setRowCount(0);
+
         try {
             List<Categoria> lista = dao.listarTodas();
             for (Categoria c : lista) {
                 modelo.addRow(new Object[]{
-                    c.getId(), c.getNome(), c.getTamanho(), c.getEmbalagem()
+                        c.getId(),
+                        c.getNome(),
+                        c.getTamanho(),
+                        c.getEmbalagem()
                 });
             }
-        } catch (SQLException e) {
+        } catch (Exception e) {
             Mensagem.erro("Erro ao carregar categorias: " + e.getMessage());
         }
     }

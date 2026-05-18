@@ -54,26 +54,19 @@ public class CategoriaDAO {
         }
     }
 
-    public List<Categoria> listarTodos() {
-        List<Categoria> lista = new ArrayList<>();
+    public List<Categoria> listarTodas() throws SQLException {
         String sql = "SELECT * FROM categoria ORDER BY nome";
-        Connection conn = ConexaoDB.getConnection();
-        try {
-            PreparedStatement ps = conn.prepareStatement(sql);
-            ResultSet rs = ps.executeQuery();
+        List<Categoria> lista = new ArrayList<>();
+
+        try (Connection conn = ConexaoDB.getConnection();
+             Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery(sql)) {
+
             while (rs.next()) {
-                Categoria c = new Categoria();
-                c.setId(rs.getInt("id"));
-                c.setNome(rs.getString("nome"));
-                c.setTamanho(Categoria.Tamanho.valueOf(rs.getString("tamanho")));
-                c.setEmbalagem(Categoria.Embalagem.valueOf(rs.getString("embalagem")));
-                lista.add(c);
+                lista.add(mapear(rs));
             }
-        } catch (SQLException e) {
-            throw new RuntimeException("Erro ao listar categorias: " + e.getMessage(), e);
-        } finally {
-            ConexaoDB.closeConnection(conn);
         }
+
         return lista;
     }
 
@@ -84,19 +77,25 @@ public class CategoriaDAO {
             PreparedStatement ps = conn.prepareStatement(sql);
             ps.setInt(1, id);
             ResultSet rs = ps.executeQuery();
+
             if (rs.next()) {
-                Categoria c = new Categoria();
-                c.setId(rs.getInt("id"));
-                c.setNome(rs.getString("nome"));
-                c.setTamanho(Categoria.Tamanho.valueOf(rs.getString("tamanho")));
-                c.setEmbalagem(Categoria.Embalagem.valueOf(rs.getString("embalagem")));
-                return c;
+                return mapear(rs);
             }
+
         } catch (SQLException e) {
             throw new RuntimeException("Erro ao buscar categoria: " + e.getMessage(), e);
         } finally {
             ConexaoDB.closeConnection(conn);
         }
         return null;
+    }
+
+    private Categoria mapear(ResultSet rs) throws SQLException {
+        Categoria c = new Categoria();
+        c.setId(rs.getInt("id"));
+        c.setNome(rs.getString("nome"));
+        c.setTamanho(Categoria.Tamanho.valueOf(rs.getString("tamanho")));
+        c.setEmbalagem(Categoria.Embalagem.valueOf(rs.getString("embalagem")));
+        return c;
     }
 }

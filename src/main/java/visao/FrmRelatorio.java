@@ -9,18 +9,17 @@ import modelo.Produto;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
-import java.sql.SQLException;
 import java.util.List;
 
 public class FrmRelatorio extends JFrame {
 
-    private JPanel     painelConteudo;
-    private JLabel     lblTitulo;
-    private JLabel     lblRodape;
+    private JPanel painelConteudo;
+    private JLabel lblTitulo;
+    private JLabel lblRodape;
 
-    private final ProdutoDAO      produtoDAO   = new ProdutoDAO();
-    private final CategoriaDAO    categoriaDAO = new CategoriaDAO();
-    private final MovimentacaoDAO movDAO       = new MovimentacaoDAO();
+    private final ProdutoDAO produtoDAO = new ProdutoDAO();
+    private final CategoriaDAO categoriaDAO = new CategoriaDAO();
+    private final MovimentacaoDAO movDAO = new MovimentacaoDAO();
 
     public FrmRelatorio() {
         initComponents();
@@ -33,22 +32,14 @@ public class FrmRelatorio extends JFrame {
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLayout(new BorderLayout(0, 8));
 
-        // ── Botões de seleção ────────────────────────
         JPanel pnlBotoes = new JPanel(new FlowLayout(FlowLayout.LEFT, 6, 8));
         pnlBotoes.setBackground(new Color(236, 240, 241));
-        pnlBotoes.setBorder(BorderFactory.createEmptyBorder(4, 6, 4, 6));
 
         JButton btn1 = new JButton("📋 Lista de Preços");
         JButton btn2 = new JButton("⚖ Balanço Físico/Financeiro");
         JButton btn3 = new JButton("⚠ Abaixo do Mínimo");
         JButton btn4 = new JButton("🏷 Produtos por Categoria");
         JButton btn5 = new JButton("🔝 Mais Entrada / Saída");
-
-        estilizarBotao(btn1, new Color(41, 128, 185));
-        estilizarBotao(btn2, new Color(142, 68, 173));
-        estilizarBotao(btn3, new Color(192, 57, 43));
-        estilizarBotao(btn4, new Color(22, 160, 133));
-        estilizarBotao(btn5, new Color(211, 84, 0));
 
         btn1.addActionListener(e -> relListaPrecos());
         btn2.addActionListener(e -> relBalanco());
@@ -64,261 +55,120 @@ public class FrmRelatorio extends JFrame {
 
         add(pnlBotoes, BorderLayout.NORTH);
 
-        // ── Título do relatório ──────────────────────
-        lblTitulo = new JLabel("Selecione um relatório acima.", SwingConstants.LEFT);
-        lblTitulo.setFont(new Font("Segoe UI", Font.BOLD, 13));
-        lblTitulo.setForeground(new Color(52, 73, 94));
-        lblTitulo.setBorder(BorderFactory.createEmptyBorder(0, 10, 0, 10));
+        lblTitulo = new JLabel("Selecione um relatório acima.");
         add(lblTitulo, BorderLayout.CENTER);
 
-        // ── Painel de conteúdo ───────────────────────
         painelConteudo = new JPanel(new BorderLayout());
-        painelConteudo.setBackground(Color.WHITE);
-        painelConteudo.setBorder(BorderFactory.createEmptyBorder(4, 8, 4, 8));
         add(painelConteudo, BorderLayout.CENTER);
 
-        // ── Rodapé ───────────────────────────────────
         lblRodape = new JLabel("", SwingConstants.RIGHT);
-        lblRodape.setFont(new Font("Segoe UI", Font.BOLD, 13));
-        lblRodape.setForeground(new Color(52, 73, 94));
-        lblRodape.setBorder(BorderFactory.createEmptyBorder(4, 10, 8, 10));
         add(lblRodape, BorderLayout.SOUTH);
     }
 
-    // ─────────────────────────────────────────────
-    // Relatório 1 — Lista de Preços
-    // ─────────────────────────────────────────────
     private void relListaPrecos() {
-        lblTitulo.setText("📋 Lista de Preços — produtos em ordem alfabética");
-        lblRodape.setText("");
-
         DefaultTableModel m = new DefaultTableModel(
-            new String[]{"Nome", "Preço Unitário", "Unidade", "Categoria"}, 0) {
-            @Override public boolean isCellEditable(int r, int c) { return false; }
-        };
+                new String[]{"Nome", "Preço", "Unidade", "Categoria"}, 0);
 
         try {
             for (Produto p : produtoDAO.listarTodos()) {
                 m.addRow(new Object[]{
-                    p.getNome(),
-                    String.format("R$ %.2f", p.getPreco()),
-                    p.getUnidade(),
-                    p.getCategoria() != null ? p.getCategoria().getNome() : ""
+                        p.getNome(),
+                        p.getPreco(),
+                        p.getUnidade(),
+                        p.getCategoria() != null ? p.getCategoria().getNome() : ""
                 });
             }
-        } catch (SQLException e) {
-            Mensagem.erro("Erro: " + e.getMessage());
+        } catch (Exception e) {
+            Mensagem.erro(e.getMessage());
         }
 
-        exibirTabela(m, new int[]{280, 120, 80, 160});
+        exibirTabela(m);
     }
 
-    // ─────────────────────────────────────────────
-    // Relatório 2 — Balanço Físico/Financeiro
-    // ─────────────────────────────────────────────
     private void relBalanco() {
-        lblTitulo.setText("⚖ Balanço Físico/Financeiro");
-
         DefaultTableModel m = new DefaultTableModel(
-            new String[]{"Nome", "Qtd. Estoque", "Preço Unit.", "Valor Total"}, 0) {
-            @Override public boolean isCellEditable(int r, int c) { return false; }
-        };
+                new String[]{"Nome", "Estoque", "Preço", "Total"}, 0);
 
-        double totalGeral = 0;
         try {
             for (Produto p : produtoDAO.listarTodos()) {
                 double total = p.getPreco() * p.getQtdEstoque();
-                totalGeral += total;
                 m.addRow(new Object[]{
-                    p.getNome(),
-                    p.getQtdEstoque(),
-                    String.format("R$ %.2f", p.getPreco()),
-                    String.format("R$ %.2f", total)
+                        p.getNome(),
+                        p.getQtdEstoque(),
+                        p.getPreco(),
+                        total
                 });
             }
-        } catch (SQLException e) {
-            Mensagem.erro("Erro: " + e.getMessage());
+        } catch (Exception e) {
+            Mensagem.erro(e.getMessage());
         }
 
-        lblRodape.setText(String.format("Valor total do estoque: R$ %.2f", totalGeral));
-        exibirTabela(m, new int[]{260, 110, 110, 120});
+        exibirTabela(m);
     }
 
-    // ─────────────────────────────────────────────
-    // Relatório 3 — Abaixo do mínimo
-    // ─────────────────────────────────────────────
     private void relAbaixoMinimo() {
-        lblTitulo.setText("⚠ Produtos abaixo da quantidade mínima");
-        lblRodape.setText("");
-
         DefaultTableModel m = new DefaultTableModel(
-            new String[]{"Nome", "Qtd. Mínima", "Qtd. em Estoque"}, 0) {
-            @Override public boolean isCellEditable(int r, int c) { return false; }
-        };
+                new String[]{"Nome", "Min", "Estoque"}, 0);
 
         try {
-            List<Produto> lista = produtoDAO.listarTodos().stream()
-                .filter(p -> p.getQtdEstoque() < p.getQtdMinima())
-                .toList();
-
-            for (Produto p : lista) {
-                m.addRow(new Object[]{
-                    p.getNome(),
-                    p.getQtdMinima(),
-                    p.getQtdEstoque()
-                });
-            }
-        } catch (SQLException e) {
-            Mensagem.erro("Erro: " + e.getMessage());
-        }
-
-        // Destaca quantidade em estoque de vermelho
-        JTable tabela = criarTabela(m, new int[]{300, 120, 140});
-        tabela.getColumnModel().getColumn(2).setCellRenderer(
-            (t, value, isSelected, hasFocus, row, col) -> {
-                JLabel lbl = new JLabel(value != null ? value.toString() : "");
-                lbl.setOpaque(true);
-                lbl.setHorizontalAlignment(SwingConstants.CENTER);
-                if (isSelected) {
-                    lbl.setBackground(t.getSelectionBackground());
-                    lbl.setForeground(Color.WHITE);
-                } else {
-                    lbl.setBackground(Color.WHITE);
-                    lbl.setForeground(new Color(192, 57, 43));
-                    lbl.setFont(lbl.getFont().deriveFont(Font.BOLD));
+            for (Produto p : produtoDAO.listarTodos()) {
+                if (p.getQtdEstoque() < p.getQtdMinima()) {
+                    m.addRow(new Object[]{
+                            p.getNome(),
+                            p.getQtdMinima(),
+                            p.getQtdEstoque()
+                    });
                 }
-                return lbl;
             }
-        );
-
-        if (m.getRowCount() == 0) {
-            exibirMensagem("✅ Nenhum produto abaixo do estoque mínimo.");
-        } else {
-            painelConteudo.removeAll();
-            painelConteudo.add(new JScrollPane(tabela), BorderLayout.CENTER);
-            painelConteudo.revalidate();
-            painelConteudo.repaint();
+        } catch (Exception e) {
+            Mensagem.erro(e.getMessage());
         }
+
+        exibirTabela(m);
     }
 
-    // ─────────────────────────────────────────────
-    // Relatório 4 — Produtos por categoria
-    // ─────────────────────────────────────────────
     private void relPorCategoria() {
-        lblTitulo.setText("🏷 Quantidade de produtos distintos por categoria");
-        lblRodape.setText("");
-
         DefaultTableModel m = new DefaultTableModel(
-            new String[]{"Categoria", "Qtd. de Produtos"}, 0) {
-            @Override public boolean isCellEditable(int r, int c) { return false; }
-        };
+                new String[]{"Categoria", "Qtd"}, 0);
 
         try {
-            List<Produto>   produtos    = produtoDAO.listarTodos();
-            List<Categoria> categorias  = categoriaDAO.listarTodas();
+            List<Produto> produtos = produtoDAO.listarTodos();
+            List<Categoria> categorias = categoriaDAO.listarTodas();
 
-            for (Categoria cat : categorias) {
+            for (Categoria c : categorias) {
                 long count = produtos.stream()
-                    .filter(p -> p.getCategoria() != null
-                            && p.getCategoria().getId() == cat.getId())
-                    .count();
+                        .filter(p -> p.getCategoria() != null &&
+                                p.getCategoria().getId() == c.getId())
+                        .count();
+
                 if (count > 0) {
-                    m.addRow(new Object[]{ cat.getNome(), count });
+                    m.addRow(new Object[]{c.getNome(), count});
                 }
             }
-        } catch (SQLException e) {
-            Mensagem.erro("Erro: " + e.getMessage());
+        } catch (Exception e) {
+            Mensagem.erro(e.getMessage());
         }
 
-        if (m.getRowCount() == 0) {
-            exibirMensagem("Nenhuma categoria com produtos cadastrados.");
-        } else {
-            exibirTabela(m, new int[]{400, 200});
-        }
+        exibirTabela(m);
     }
 
-    // ─────────────────────────────────────────────
-    // Relatório 5 — Mais entrada e mais saída
-    // ─────────────────────────────────────────────
     private void relMaisMovimentados() {
-        lblTitulo.setText("🔝 Produto com mais entradas e mais saídas");
-        lblRodape.setText("");
-
         try {
-            String maisEntrada = movDAO.produtoMaisEntrada();
-            String maisSaida   = movDAO.produtoMaisSaida();
+            String entrada = movDAO.produtoMaisEntrada();
+            String saida = movDAO.produtoMaisSaida();
 
-            JPanel painel = new JPanel(new GridLayout(2, 1, 0, 16));
-            painel.setBackground(Color.WHITE);
-            painel.setBorder(BorderFactory.createEmptyBorder(30, 60, 30, 60));
+            JOptionPane.showMessageDialog(this,
+                    "Mais entrada: " + entrada + "\nMais saída: " + saida);
 
-            painel.add(criarCartao("📥 Produto com Mais Entradas", maisEntrada, new Color(39, 174, 96)));
-            painel.add(criarCartao("📤 Produto com Mais Saídas",   maisSaida,   new Color(192, 57, 43)));
-
-            painelConteudo.removeAll();
-            painelConteudo.add(painel, BorderLayout.CENTER);
-            painelConteudo.revalidate();
-            painelConteudo.repaint();
-
-        } catch (SQLException e) {
-            Mensagem.erro("Erro: " + e.getMessage());
+        } catch (Exception e) {
+            Mensagem.erro(e.getMessage());
         }
     }
 
-    // ─────────────────────────────────────────────
-    // Helpers
-    // ─────────────────────────────────────────────
-    private JPanel criarCartao(String titulo, String valor, Color cor) {
-        JPanel card = new JPanel(new GridLayout(2, 1));
-        card.setBackground(cor);
-        card.setBorder(BorderFactory.createEmptyBorder(16, 24, 16, 24));
-
-        JLabel lblTitulo = new JLabel(titulo, SwingConstants.CENTER);
-        lblTitulo.setFont(new Font("Segoe UI", Font.PLAIN, 13));
-        lblTitulo.setForeground(Color.WHITE);
-
-        JLabel lblValor = new JLabel(valor, SwingConstants.CENTER);
-        lblValor.setFont(new Font("Segoe UI", Font.BOLD, 20));
-        lblValor.setForeground(Color.WHITE);
-
-        card.add(lblTitulo);
-        card.add(lblValor);
-        return card;
-    }
-
-    private JTable criarTabela(DefaultTableModel m, int[] larguras) {
-        JTable tabela = new JTable(m);
-        tabela.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        tabela.setRowHeight(26);
-        for (int i = 0; i < larguras.length; i++) {
-            tabela.getColumnModel().getColumn(i).setPreferredWidth(larguras[i]);
-        }
-        return tabela;
-    }
-
-    private void exibirTabela(DefaultTableModel m, int[] larguras) {
+    private void exibirTabela(DefaultTableModel m) {
         painelConteudo.removeAll();
-        painelConteudo.add(new JScrollPane(criarTabela(m, larguras)), BorderLayout.CENTER);
+        painelConteudo.add(new JScrollPane(new JTable(m)));
         painelConteudo.revalidate();
         painelConteudo.repaint();
-    }
-
-    private void exibirMensagem(String msg) {
-        painelConteudo.removeAll();
-        JLabel lbl = new JLabel(msg, SwingConstants.CENTER);
-        lbl.setFont(new Font("Segoe UI", Font.PLAIN, 14));
-        lbl.setForeground(new Color(100, 100, 100));
-        painelConteudo.add(lbl, BorderLayout.CENTER);
-        painelConteudo.revalidate();
-        painelConteudo.repaint();
-    }
-
-    private void estilizarBotao(JButton btn, Color cor) {
-        btn.setBackground(cor);
-        btn.setForeground(Color.WHITE);
-        btn.setFocusPainted(false);
-        btn.setBorderPainted(false);
-        btn.setFont(new Font("Segoe UI", Font.BOLD, 11));
-        btn.setCursor(new Cursor(Cursor.HAND_CURSOR));
     }
 }

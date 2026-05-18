@@ -136,4 +136,37 @@ public class ProdutoDAO {
         }
         return null;
     }
+
+    // ✅ MÉTODO QUE FALTAVA
+    public void atualizarEstoque(int produtoId, double quantidade) {
+        String sql = "UPDATE produto SET qtd_estoque = qtd_estoque + ? WHERE id = ?";
+        Connection conn = ConexaoDB.getConnection();
+
+        try {
+            PreparedStatement ps = conn.prepareStatement(sql);
+            ps.setDouble(1, quantidade);
+            ps.setInt(2, produtoId);
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException("Erro ao atualizar estoque: " + e.getMessage(), e);
+        } finally {
+            ConexaoDB.closeConnection(conn);
+        }
+    }
+
+    // ✅ MÉTODO QUE FALTAVA
+    public void reajustarPrecos(double percentual) {
+        String sql = "UPDATE produto SET preco = preco * (1 + ? / 100)";
+        Connection conn = ConexaoDB.getConnection();
+
+        try {
+            PreparedStatement ps = conn.prepareStatement(sql);
+            ps.setDouble(1, percentual);
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException("Erro ao reajustar preços: " + e.getMessage(), e);
+        } finally {
+            ConexaoDB.closeConnection(conn);
+        }
+    }
 }
