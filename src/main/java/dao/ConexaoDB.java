@@ -13,7 +13,7 @@ public class ConexaoDB {
             + "&serverTimezone=America/Sao_Paulo";
 
     private static final String USER = "root";
-    private static final String PASSWORD = "123456";
+    private static final String PASSWORD = "Dw6o981MxY9h";
 
     public static Connection getConnection() {
         try {
