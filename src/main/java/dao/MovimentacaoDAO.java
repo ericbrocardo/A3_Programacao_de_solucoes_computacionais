@@ -99,7 +99,7 @@ public class MovimentacaoDAO {
         return "Nenhuma movimentação registrada";
     }
 
-    // ✅ MÉTODO QUE FALTAVA (ESSENCIAL)
+    
     private Movimentacao mapear(ResultSet rs) throws SQLException {
         Movimentacao m = new Movimentacao();
 

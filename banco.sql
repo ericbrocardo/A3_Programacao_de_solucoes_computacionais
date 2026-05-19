@@ -16,7 +16,7 @@ CREATE TABLE IF NOT EXISTS produto (
     id           INT           AUTO_INCREMENT PRIMARY KEY,
     nome         VARCHAR(150)  NOT NULL UNIQUE,
     preco        DECIMAL(10,2) NOT NULL,
-    unidade      VARCHAR(20)   NOT NULL,
+    unidade      INT   NOT NULL,
     qtd_estoque  DECIMAL(10,3) NOT NULL DEFAULT 0,
     qtd_minima   DECIMAL(10,3) NOT NULL,
     qtd_maxima   DECIMAL(10,3) NOT NULL,
