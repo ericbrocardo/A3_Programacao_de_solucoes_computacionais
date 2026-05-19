@@ -31,11 +31,11 @@ public class FrmMenuPrincipal extends JFrame {
         pnlBotoes.setBackground(new Color(44, 62, 80));
         pnlBotoes.setBorder(BorderFactory.createEmptyBorder(0, 60, 30, 60));
 
-        JButton btnCategorias    = criarBotao("   Categorias",          new Color(41, 128, 185));
-        JButton btnProdutos      = criarBotao("   Produtos",             new Color(39, 174, 96));
-        JButton btnMovimentacoes = criarBotao("   Movimentações",        new Color(142, 68, 173));
-        JButton btnReajuste      = criarBotao("   Reajuste de Preços",   new Color(230, 126, 34));
-        JButton btnRelatorios    = criarBotao("   Relatórios",           new Color(192, 57, 43));
+        JButton btnCategorias    = criarBotao("  Categorias",          new Color(41, 128, 185));
+        JButton btnProdutos      = criarBotao("  Produtos",             new Color(39, 174, 96));
+        JButton btnMovimentacoes = criarBotao("  Movimentações",        new Color(142, 68, 173));
+        JButton btnReajuste      = criarBotao("  Reajuste de Preços",   new Color(230, 126, 34));
+        JButton btnRelatorios    = criarBotao("  Relatórios",           new Color(192, 57, 43));
 
         btnCategorias.addActionListener(e -> abrirCategorias());
         btnProdutos.addActionListener(e -> abrirProdutos());
