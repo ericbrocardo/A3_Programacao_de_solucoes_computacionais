@@ -1,9 +1,9 @@
 
-  # Cria o database chamado estoque
+ 
 CREATE DATABASE IF NOT EXISTS estoque;
 USE estoque;
 
- # cria a tabela de categoria 
+ 
 CREATE TABLE IF NOT EXISTS categoria (
     id        INT AUTO_INCREMENT PRIMARY KEY,
     nome      VARCHAR(100) NOT NULL UNIQUE,
@@ -11,7 +11,7 @@ CREATE TABLE IF NOT EXISTS categoria (
     embalagem ENUM('LATA', 'VIDRO', 'PLASTICO')  NOT NULL
 );
 
- # cria a tabela do produto 
+  
 CREATE TABLE IF NOT EXISTS produto (
     id           INT           AUTO_INCREMENT PRIMARY KEY,
     nome         VARCHAR(150)  NOT NULL UNIQUE,
@@ -24,7 +24,7 @@ CREATE TABLE IF NOT EXISTS produto (
     FOREIGN KEY (categoria_id) REFERENCES categoria(id)
 );
 
- # cria a tabela de movimentacao 
+ 
 CREATE TABLE IF NOT EXISTS movimentacao (
     id         INT           AUTO_INCREMENT PRIMARY KEY,
     produto_id INT           NOT NULL,
