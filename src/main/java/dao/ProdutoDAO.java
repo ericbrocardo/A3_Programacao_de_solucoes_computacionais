@@ -6,8 +6,19 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * DAO responsável pelas operações de banco de dados da entidade Produto.
+ * Realiza operações de inserir, atualizar, excluir, listar, buscar,
+ * atualizar estoque e reajustar preços dos produtos.
+ */
 public class ProdutoDAO {
 
+    /**
+     * Insere um novo produto no banco de dados.
+     *
+     * @param p Objeto Produto a ser inserido
+     * @throws RuntimeException se ocorrer erro na operação com o banco
+     */
     public void inserir(Produto p) {
         String sql = "INSERT INTO produto (nome, preco, unidade, qtd_estoque, qtd_minima, qtd_maxima, categoria_id) "
                    + "VALUES (?, ?, ?, ?, ?, ?, ?)";
@@ -29,6 +40,12 @@ public class ProdutoDAO {
         }
     }
 
+    /**
+     * Atualiza os dados de um produto existente no banco de dados.
+     *
+     * @param p Objeto Produto com os dados atualizados
+     * @throws RuntimeException se ocorrer erro na operação com o banco
+     */
     public void atualizar(Produto p) {
         String sql = "UPDATE produto SET nome = ?, preco = ?, unidade = ?, "
                    + "qtd_estoque = ?, qtd_minima = ?, qtd_maxima = ?, categoria_id = ? "
@@ -52,6 +69,12 @@ public class ProdutoDAO {
         }
     }
 
+    /**
+     * Remove um produto do banco de dados pelo seu ID.
+     *
+     * @param id Identificador do produto a ser removido
+     * @throws RuntimeException se ocorrer erro na operação com o banco
+     */
     public void excluir(int id) {
         String sql = "DELETE FROM produto WHERE id = ?";
         Connection conn = ConexaoDB.getConnection();
@@ -66,6 +89,13 @@ public class ProdutoDAO {
         }
     }
 
+    /**
+     * Retorna uma lista com todos os produtos cadastrados no banco de dados,
+     * incluindo os dados da categoria de cada produto.
+     *
+     * @return List com todos os objetos Produto encontrados
+     * @throws RuntimeException se ocorrer erro na operação com o banco
+     */
     public List<Produto> listarTodos() {
         List<Produto> lista = new ArrayList<>();
         String sql = "SELECT p.*, c.nome AS nome_cat, c.tamanho, c.embalagem "
@@ -102,6 +132,14 @@ public class ProdutoDAO {
         return lista;
     }
 
+    /**
+     * Busca um produto no banco de dados pelo seu ID,
+     * incluindo os dados da categoria associada.
+     *
+     * @param id Identificador do produto a ser buscado
+     * @return Objeto Produto encontrado ou null se não existir
+     * @throws RuntimeException se ocorrer erro na operação com o banco
+     */
     public Produto buscarPorId(int id) {
         String sql = "SELECT p.*, c.nome AS nome_cat, c.tamanho, c.embalagem "
                    + "FROM produto p JOIN categoria c ON p.categoria_id = c.id "
@@ -137,11 +175,18 @@ public class ProdutoDAO {
         return null;
     }
 
-    
+    /**
+     * Atualiza diretamente a quantidade em estoque de um produto,
+     * somando o valor informado ao estoque atual.
+     * Use valores negativos para subtrair do estoque.
+     *
+     * @param produtoId Identificador do produto a ter o estoque atualizado
+     * @param quantidade Valor a ser somado ao estoque atual
+     * @throws RuntimeException se ocorrer erro na operação com o banco
+     */
     public void atualizarEstoque(int produtoId, double quantidade) {
         String sql = "UPDATE produto SET qtd_estoque = qtd_estoque + ? WHERE id = ?";
         Connection conn = ConexaoDB.getConnection();
-
         try {
             PreparedStatement ps = conn.prepareStatement(sql);
             ps.setDouble(1, quantidade);
@@ -154,11 +199,17 @@ public class ProdutoDAO {
         }
     }
 
-    // ✅ MÉTODO QUE FALTAVA
+    /**
+     * Reajusta o preço de todos os produtos cadastrados com base
+     * em um percentual informado.
+     * Exemplo: percentual 10 aumenta 10% em todos os preços.
+     *
+     * @param percentual Percentual de reajuste a ser aplicado
+     * @throws RuntimeException se ocorrer erro na operação com o banco
+     */
     public void reajustarPrecos(double percentual) {
         String sql = "UPDATE produto SET preco = preco * (1 + ? / 100)";
         Connection conn = ConexaoDB.getConnection();
-
         try {
             PreparedStatement ps = conn.prepareStatement(sql);
             ps.setDouble(1, percentual);
