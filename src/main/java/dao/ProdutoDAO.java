@@ -137,7 +137,7 @@ public class ProdutoDAO {
         return null;
     }
 
-    // ✅ MÉTODO QUE FALTAVA
+    
     public void atualizarEstoque(int produtoId, double quantidade) {
         String sql = "UPDATE produto SET qtd_estoque = qtd_estoque + ? WHERE id = ?";
         Connection conn = ConexaoDB.getConnection();
