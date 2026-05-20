@@ -3,39 +3,47 @@ package visao;
 import javax.swing.*;
 import java.awt.*;
 
+/**
+ * Tela do menu principal do sistema de controle de estoque.
+ * Exibe os botões de navegação para todas as funcionalidades do sistema.
+ */
 public class FrmMenuPrincipal extends JFrame {
 
+    /**
+     * Construtor da tela do menu principal.
+     * Inicializa os componentes visuais da tela.
+     */
     public FrmMenuPrincipal() {
         initComponents();
     }
 
+    /**
+     * Inicializa e organiza todos os componentes visuais da tela.
+     */
     private void initComponents() {
         setTitle("Controle de Estoque");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setSize(420, 400);
         setResizable(false);
 
-        // Painel principal
         JPanel pnlPrincipal = new JPanel(new BorderLayout());
         pnlPrincipal.setBackground(new Color(44, 62, 80));
 
-        // Cabeçalho
         JLabel lblTitulo = new JLabel("Controle de Estoque", SwingConstants.CENTER);
         lblTitulo.setFont(new Font("Segoe UI", Font.BOLD, 20));
         lblTitulo.setForeground(Color.WHITE);
         lblTitulo.setBorder(BorderFactory.createEmptyBorder(24, 0, 24, 0));
         pnlPrincipal.add(lblTitulo, BorderLayout.NORTH);
 
-        // Painel de botões
         JPanel pnlBotoes = new JPanel(new GridLayout(5, 1, 0, 10));
         pnlBotoes.setBackground(new Color(44, 62, 80));
         pnlBotoes.setBorder(BorderFactory.createEmptyBorder(0, 60, 30, 60));
 
-        JButton btnCategorias    = criarBotao("  Categorias",          new Color(41, 128, 185));
-        JButton btnProdutos      = criarBotao("  Produtos",             new Color(39, 174, 96));
-        JButton btnMovimentacoes = criarBotao("  Movimentações",        new Color(142, 68, 173));
-        JButton btnReajuste      = criarBotao("  Reajuste de Preços",   new Color(230, 126, 34));
-        JButton btnRelatorios    = criarBotao("  Relatórios",           new Color(192, 57, 43));
+        JButton btnCategorias    = criarBotao("  Categorias",        new Color(41, 128, 185));
+        JButton btnProdutos      = criarBotao("  Produtos",           new Color(39, 174, 96));
+        JButton btnMovimentacoes = criarBotao("  Movimentações",      new Color(142, 68, 173));
+        JButton btnReajuste      = criarBotao("  Reajuste de Preços", new Color(230, 126, 34));
+        JButton btnRelatorios    = criarBotao("  Relatórios",         new Color(192, 57, 43));
 
         btnCategorias.addActionListener(e -> abrirCategorias());
         btnProdutos.addActionListener(e -> abrirProdutos());
@@ -53,6 +61,13 @@ public class FrmMenuPrincipal extends JFrame {
         add(pnlPrincipal);
     }
 
+    /**
+     * Cria um botão estilizado com texto e cor definidos.
+     *
+     * @param texto Texto a ser exibido no botão
+     * @param cor   Cor de fundo do botão
+     * @return Botão configurado com o estilo padrão do sistema
+     */
     private JButton criarBotao(String texto, Color cor) {
         JButton btn = new JButton(texto);
         btn.setFont(new Font("Segoe UI", Font.BOLD, 14));
@@ -65,22 +80,37 @@ public class FrmMenuPrincipal extends JFrame {
         return btn;
     }
 
+    /**
+     * Abre a tela de gerenciamento de categorias.
+     */
     private void abrirCategorias() {
         new FrmCategoria().setVisible(true);
     }
 
+    /**
+     * Abre a tela de gerenciamento de produtos.
+     */
     private void abrirProdutos() {
         new FrmProduto().setVisible(true);
     }
 
+    /**
+     * Abre a tela de registro de movimentações de estoque.
+     */
     private void abrirMovimentacoes() {
         new FrmMovimentacao().setVisible(true);
     }
 
+    /**
+     * Abre a tela de reajuste de preços dos produtos.
+     */
     private void abrirReajuste() {
         new FrmReajuste().setVisible(true);
     }
 
+    /**
+     * Abre a tela de relatórios do sistema.
+     */
     private void abrirRelatorios() {
         new FrmRelatorio().setVisible(true);
     }
