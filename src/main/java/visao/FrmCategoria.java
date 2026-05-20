@@ -10,6 +10,10 @@ import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.util.List;
 
+/**
+ * Tela de cadastro e gerenciamento de categorias.
+ * Permite inserir, atualizar, excluir e listar categorias no sistema.
+ */
 public class FrmCategoria extends JFrame {
 
     private JTextField txtNome;
@@ -21,11 +25,18 @@ public class FrmCategoria extends JFrame {
     private final CategoriaDAO dao = new CategoriaDAO();
     private Categoria categoriaSelecionada = null;
 
+    /**
+     * Construtor da tela de categorias.
+     * Inicializa os componentes e carrega os dados da tabela.
+     */
     public FrmCategoria() {
         initComponents();
         carregarTabela();
     }
 
+    /**
+     * Inicializa e organiza todos os componentes visuais da tela.
+     */
     private void initComponents() {
         setTitle("Categorias");
         setSize(620, 480);
@@ -41,35 +52,26 @@ public class FrmCategoria extends JFrame {
         gbc.insets = new Insets(6, 8, 6, 8);
         gbc.fill = GridBagConstraints.HORIZONTAL;
 
-        gbc.gridx = 0;
-        gbc.gridy = 0;
+        gbc.gridx = 0; gbc.gridy = 0;
         pnlForm.add(new JLabel("Nome:"), gbc);
 
-        gbc.gridx = 1;
-        gbc.gridwidth = 3;
-        gbc.weightx = 1;
+        gbc.gridx = 1; gbc.gridwidth = 3; gbc.weightx = 1;
         txtNome = new JTextField();
         pnlForm.add(txtNome, gbc);
 
-        gbc.gridx = 0;
-        gbc.gridy = 1;
-        gbc.gridwidth = 1;
-        gbc.weightx = 0;
+        gbc.gridx = 0; gbc.gridy = 1; gbc.gridwidth = 1; gbc.weightx = 0;
         pnlForm.add(new JLabel("Tamanho:"), gbc);
 
-        gbc.gridx = 1;
-        gbc.weightx = 0.5;
+        gbc.gridx = 1; gbc.weightx = 0.5;
         cmbTamanho = new JComboBox<>(Tamanho.values());
         cmbTamanho.insertItemAt(null, 0);
         cmbTamanho.setSelectedIndex(0);
         pnlForm.add(cmbTamanho, gbc);
 
-        gbc.gridx = 2;
-        gbc.weightx = 0;
+        gbc.gridx = 2; gbc.weightx = 0;
         pnlForm.add(new JLabel("Embalagem:"), gbc);
 
-        gbc.gridx = 3;
-        gbc.weightx = 0.5;
+        gbc.gridx = 3; gbc.weightx = 0.5;
         cmbEmbalagem = new JComboBox<>(Embalagem.values());
         cmbEmbalagem.insertItemAt(null, 0);
         cmbEmbalagem.setSelectedIndex(0);
@@ -94,9 +96,7 @@ public class FrmCategoria extends JFrame {
         pnlBotoes.add(btnLimpar);
         pnlBotoes.add(btnExcluir);
 
-        gbc.gridx = 0;
-        gbc.gridy = 2;
-        gbc.gridwidth = 4;
+        gbc.gridx = 0; gbc.gridy = 2; gbc.gridwidth = 4;
         pnlForm.add(pnlBotoes, gbc);
 
         add(pnlForm, BorderLayout.NORTH);
@@ -123,6 +123,11 @@ public class FrmCategoria extends JFrame {
         add(new JScrollPane(tabela), BorderLayout.CENTER);
     }
 
+    /**
+     * Salva ou atualiza uma categoria no banco de dados.
+     * Se nenhuma categoria estiver selecionada, realiza uma inserção.
+     * Caso contrário, atualiza a categoria selecionada.
+     */
     private void salvar() {
         String nome = txtNome.getText().trim();
         Tamanho tamanho = (Tamanho) cmbTamanho.getSelectedItem();
@@ -144,15 +149,17 @@ public class FrmCategoria extends JFrame {
                 dao.atualizar(categoriaSelecionada);
                 Mensagem.info("Categoria atualizada com sucesso!");
             }
-
             limpar();
             carregarTabela();
-
         } catch (Exception e) {
             Mensagem.erro("Erro ao salvar: " + e.getMessage());
         }
     }
 
+    /**
+     * Exclui a categoria selecionada na tabela após confirmação do usuário.
+     * Exibe mensagem de erro caso existam produtos vinculados à categoria.
+     */
     private void excluir() {
         if (categoriaSelecionada == null) {
             Mensagem.aviso("Selecione uma categoria para excluir.");
@@ -162,20 +169,16 @@ public class FrmCategoria extends JFrame {
         if (Mensagem.confirmar("Deseja excluir a categoria \"" + categoriaSelecionada.getNome() + "\"?")) {
             try {
                 dao.excluir(categoriaSelecionada.getId());
-
                 Mensagem.info("Categoria excluída com sucesso!");
                 limpar();
                 carregarTabela();
-
             } catch (Exception e) {
                 String erro = e.getMessage();
-
                 if (erro != null && (
                         erro.contains("foreign key constraint fails")
-                                || erro.contains("Cannot delete or update a parent row")
-                                || erro.contains("produto")
-                                || erro.contains("categoria_id")
-                )) {
+                        || erro.contains("Cannot delete or update a parent row")
+                        || erro.contains("produto")
+                        || erro.contains("categoria_id"))) {
                     Mensagem.erro("Não é possível excluir esta categoria, pois existem produtos cadastrados nela.");
                 } else {
                     Mensagem.erro("Erro ao excluir categoria: " + erro);
@@ -184,6 +187,9 @@ public class FrmCategoria extends JFrame {
         }
     }
 
+    /**
+     * Limpa os campos do formulário e remove a seleção da tabela.
+     */
     private void limpar() {
         txtNome.setText("");
         cmbTamanho.setSelectedIndex(0);
@@ -192,49 +198,52 @@ public class FrmCategoria extends JFrame {
         categoriaSelecionada = null;
     }
 
+    /**
+     * Carrega os dados da categoria selecionada na tabela para os campos do formulário.
+     */
     private void selecionarLinha() {
         int linha = tabela.getSelectedRow();
-
-        if (linha < 0) {
-            return;
-        }
+        if (linha < 0) return;
 
         int id = (int) modelo.getValueAt(linha, 0);
-
         try {
             categoriaSelecionada = dao.buscarPorId(id);
-
             if (categoriaSelecionada != null) {
                 txtNome.setText(categoriaSelecionada.getNome());
                 cmbTamanho.setSelectedItem(categoriaSelecionada.getTamanho());
                 cmbEmbalagem.setSelectedItem(categoriaSelecionada.getEmbalagem());
             }
-
         } catch (Exception e) {
             Mensagem.erro("Erro ao buscar categoria: " + e.getMessage());
         }
     }
 
+    /**
+     * Carrega todas as categorias do banco de dados e exibe na tabela.
+     */
     private void carregarTabela() {
         modelo.setRowCount(0);
-
         try {
             List<Categoria> lista = dao.listarTodas();
-
             for (Categoria c : lista) {
                 modelo.addRow(new Object[]{
-                        c.getId(),
-                        c.getNome(),
-                        c.getTamanho(),
-                        c.getEmbalagem()
+                    c.getId(),
+                    c.getNome(),
+                    c.getTamanho(),
+                    c.getEmbalagem()
                 });
             }
-
         } catch (Exception e) {
             Mensagem.erro("Erro ao carregar categorias: " + e.getMessage());
         }
     }
 
+    /**
+     * Aplica estilo visual padronizado a um botão.
+     *
+     * @param btn Botão a ser estilizado
+     * @param cor Cor de fundo a ser aplicada
+     */
     private void estilizarBotao(JButton btn, Color cor) {
         btn.setBackground(cor);
         btn.setForeground(Color.WHITE);
