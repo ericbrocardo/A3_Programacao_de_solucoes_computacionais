@@ -14,6 +14,11 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.List;
 
+/**
+ * Tela de registro e listagem de movimentações de estoque.
+ * Permite registrar entradas e saídas de produtos, validando
+ * estoque disponível e atualizando automaticamente as quantidades.
+ */
 public class FrmMovimentacao extends JFrame {
 
     private JComboBox<Produto> cmbProduto;
@@ -28,12 +33,19 @@ public class FrmMovimentacao extends JFrame {
 
     private static final DateTimeFormatter FORMATO = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
+    /**
+     * Construtor da tela de movimentações.
+     * Inicializa os componentes, carrega os produtos e a tabela de movimentações.
+     */
     public FrmMovimentacao() {
         initComponents();
         carregarProdutos();
         carregarTabela();
     }
 
+    /**
+     * Inicializa e organiza todos os componentes visuais da tela.
+     */
     private void initComponents() {
         setTitle("Movimentações de Estoque");
         setSize(720, 520);
@@ -49,19 +61,14 @@ public class FrmMovimentacao extends JFrame {
         gbc.insets = new Insets(6, 8, 6, 8);
         gbc.fill = GridBagConstraints.HORIZONTAL;
 
-        gbc.gridy = 0;
-        gbc.gridx = 0;
+        gbc.gridy = 0; gbc.gridx = 0;
         pnlForm.add(new JLabel("Produto:"), gbc);
 
-        gbc.gridx = 1;
-        gbc.gridwidth = 3;
-        gbc.weightx = 1;
+        gbc.gridx = 1; gbc.gridwidth = 3; gbc.weightx = 1;
         cmbProduto = new JComboBox<>();
         pnlForm.add(cmbProduto, gbc);
 
-        gbc.gridx = 4;
-        gbc.gridwidth = 1;
-        gbc.weightx = 0;
+        gbc.gridx = 4; gbc.gridwidth = 1; gbc.weightx = 0;
         pnlForm.add(new JLabel("Tipo:"), gbc);
 
         gbc.gridx = 5;
@@ -70,9 +77,7 @@ public class FrmMovimentacao extends JFrame {
         cmbTipo.setSelectedIndex(0);
         pnlForm.add(cmbTipo, gbc);
 
-        gbc.gridy = 1;
-
-        gbc.gridx = 0;
+        gbc.gridy = 1; gbc.gridx = 0;
         pnlForm.add(new JLabel("Data (dd/MM/yyyy):"), gbc);
 
         gbc.gridx = 1;
@@ -96,9 +101,7 @@ public class FrmMovimentacao extends JFrame {
         pnlBotoes.add(btnRegistrar);
         pnlBotoes.add(btnLimpar);
 
-        gbc.gridx = 0;
-        gbc.gridy = 2;
-        gbc.gridwidth = 6;
+        gbc.gridx = 0; gbc.gridy = 2; gbc.gridwidth = 6;
         pnlForm.add(pnlBotoes, gbc);
 
         add(pnlForm, BorderLayout.NORTH);
@@ -114,6 +117,11 @@ public class FrmMovimentacao extends JFrame {
         add(new JScrollPane(tabela), BorderLayout.CENTER);
     }
 
+    /**
+     * Registra uma nova movimentação no banco de dados.
+     * Valida os campos obrigatórios, o formato da data, a quantidade
+     * e verifica se há estoque suficiente em caso de saída.
+     */
     private void registrar() {
         Produto produto = (Produto) cmbProduto.getSelectedItem();
         Tipo tipo = (Tipo) cmbTipo.getSelectedItem();
@@ -139,26 +147,25 @@ public class FrmMovimentacao extends JFrame {
             return;
         }
 
-        // ❗ valida estoque para saída
         if (tipo == Tipo.SAIDA && produto.getQtdEstoque() < quantidade) {
             Mensagem.erro("Estoque insuficiente!");
             return;
         }
 
         try {
-            // ✔️ DAO já atualiza estoque sozinho
             movDAO.inserir(new Movimentacao(0, produto, data, quantidade, tipo));
-
             Mensagem.info("Movimentação registrada!");
             limpar();
             carregarProdutos();
             carregarTabela();
-
         } catch (Exception e) {
             Mensagem.erro("Erro: " + e.getMessage());
         }
     }
 
+    /**
+     * Limpa os campos do formulário e redefine os valores padrão.
+     */
     private void limpar() {
         cmbProduto.setSelectedIndex(-1);
         cmbTipo.setSelectedIndex(0);
@@ -166,18 +173,20 @@ public class FrmMovimentacao extends JFrame {
         txtQuantidade.setText("");
     }
 
+    /**
+     * Carrega todas as movimentações do banco de dados e exibe na tabela.
+     */
     private void carregarTabela() {
         modelo.setRowCount(0);
-
         try {
             List<Movimentacao> lista = movDAO.listarTodas();
             for (Movimentacao m : lista) {
                 modelo.addRow(new Object[]{
-                        m.getId(),
-                        m.getProduto() != null ? m.getProduto().getId() : "",
-                        m.getTipo(),
-                        m.getQuantidade(),
-                        m.getData().format(FORMATO)
+                    m.getId(),
+                    m.getProduto() != null ? m.getProduto().getId() : "",
+                    m.getTipo(),
+                    m.getQuantidade(),
+                    m.getData().format(FORMATO)
                 });
             }
         } catch (Exception e) {
@@ -185,9 +194,11 @@ public class FrmMovimentacao extends JFrame {
         }
     }
 
+    /**
+     * Carrega todos os produtos do banco de dados no combobox de produtos.
+     */
     private void carregarProdutos() {
         cmbProduto.removeAllItems();
-
         try {
             List<Produto> lista = produtoDAO.listarTodos();
             for (Produto p : lista) {
