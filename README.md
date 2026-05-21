@@ -20,6 +20,14 @@ Além disso, o sistema oferece relatórios gerenciais para apoiar a tomada de de
 - Reajuste percentual de preços
 - Relatórios: lista de preços, balanço financeiro, produtos críticos, produtos por categoria e ranking de movimentações
 
+## Tecnologias Utilizadas
+
+- Java (JDK)  ->  Versão: 25  ->  Descrição: Linguagem principal de desenvolvimento           
+- Apache NetBeans IDE  ->  Versão: 29  ->  Descrição: Ambiente de desenvolvimento integrado (IDE)      
+- MySQL  ->  Versão: 8.0  ->  Descrição: Sistema gerenciador de banco de dados relacional 
+- MySQL Connector/J  ->  Versão: 8.3.0  ->  Descrição: Driver JDBC para conexão Java com o MySQL        
+- Apache Maven  ->  Versão: 3.9.12  ->  Descrição: Gerenciador de dependências e build do projeto   
+
 ## Integrantes do Projeto
 
 Arthur Coelho
