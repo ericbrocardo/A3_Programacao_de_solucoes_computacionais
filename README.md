@@ -27,6 +27,17 @@ Além disso, o sistema oferece relatórios gerenciais para apoiar a tomada de de
 - RF 011: O sistema deve gerar relatório da quantidade de produtos distintos por categoria 
 - RF 012: O sistema deve gerar relatório do produto com maior número de entradas e saídas 
 
+## Requisitos Não Funcionais
+
+- RNF 001: O sistema foi desenvolvido na linguagem Java (JDK 25) 
+- RNF 002: O sistema deve utilizar o banco de dados MySQL 8.0 
+- RNF 003: A conexão com o banco de dados deve ser feita via JDBC utilizando MySQL Connector/J 8.3.0 
+- RNF 004: O sistema deve seguir o padrão de projeto DAO para acesso aos dados 
+- RNF 005: O código deve ser organizado em pacotes por responsabilidade (dao, modelo, principal, visao) 
+- RNF 006: O sistema deve ser gerenciado com Apache Maven 3.9.12 
+- RNF 007: O código-fonte deve seguir padrões de nomenclatura e estar devidamente comentado
+- RNF 008: O desenvolvimento deve ser colaborativo utilizando GitHub com commits frequentes e descritivos 
+
 ## Tecnologias Utilizadas
 
 - Java (JDK)  ->  Versão: 25  ->  Descrição: Linguagem principal de desenvolvimento           
@@ -57,7 +68,4 @@ Vinicius Weisweiler
 RA: 1072616210
 Github: viniciusw2408-lang
 
-## Observação
 
-Este projeto ainda está sendo desenvolvido de acordo que o semestre passa, com possiblidade de ter alterações e atualizações de acordo com o que for preciso, 
-e os ajustes e comentários do professor responsável.
