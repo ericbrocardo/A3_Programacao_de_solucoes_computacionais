@@ -205,19 +205,17 @@ public class FrmProduto extends JFrame {
 
         try {
             produtoDAO.excluir(produtoSelecionado.getId());
-
             Mensagem.info("Produto excluído!");
             limpar();
             carregarTabela();
 
         } catch (Exception e) {
             String erro = e.getMessage();
-
             if (erro != null && (
                     erro.contains("foreign key constraint fails")
-                            || erro.contains("Cannot delete or update a parent row")
-                            || erro.contains("movimentacao")
-                            || erro.contains("produto_id")
+                    || erro.contains("Cannot delete or update a parent row")
+                    || erro.contains("movimentacao")
+                    || erro.contains("produto_id")
             )) {
                 Mensagem.erro("Não é possível excluir este produto, pois ele possui movimentações cadastradas.");
             } else {
@@ -259,7 +257,15 @@ public class FrmProduto extends JFrame {
             txtQtdEstoque.setText(String.valueOf(produtoSelecionado.getQtdEstoque()));
             txtQtdMinima.setText(String.valueOf(produtoSelecionado.getQtdMinima()));
             txtQtdMaxima.setText(String.valueOf(produtoSelecionado.getQtdMaxima()));
-            cmbCategoria.setSelectedItem(produtoSelecionado.getCategoria());
+
+            // Seleciona a categoria correta pelo id
+            for (int i = 0; i < cmbCategoria.getItemCount(); i++) {
+                Categoria cat = cmbCategoria.getItemAt(i);
+                if (cat.getId() == produtoSelecionado.getCategoria().getId()) {
+                    cmbCategoria.setSelectedIndex(i);
+                    break;
+                }
+            }
 
         } catch (Exception e) {
             Mensagem.erro("Erro: " + e.getMessage());

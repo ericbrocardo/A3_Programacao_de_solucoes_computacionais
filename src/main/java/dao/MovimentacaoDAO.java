@@ -18,6 +18,8 @@ import java.util.List;
  */
 public class MovimentacaoDAO {
 
+    private final ProdutoDAO produtoDAO = new ProdutoDAO();
+
     /**
      * Insere uma nova movimentação no banco de dados e atualiza
      * automaticamente o estoque do produto relacionado.
@@ -137,7 +139,8 @@ public class MovimentacaoDAO {
     }
 
     /**
-     * Mapeia uma linha do ResultSet para um objeto Movimentacao.
+     * Mapeia uma linha do ResultSet para um objeto Movimentacao,
+     * buscando o produto completo incluindo sua categoria.
      *
      * @param rs ResultSet posicionado na linha a ser mapeada
      * @return Objeto Movimentacao preenchido com os dados da linha
@@ -146,8 +149,7 @@ public class MovimentacaoDAO {
     private Movimentacao mapear(ResultSet rs) throws SQLException {
         Movimentacao m = new Movimentacao();
         m.setId(rs.getInt("id"));
-        Produto p = new Produto();
-        p.setId(rs.getInt("produto_id"));
+        Produto p = produtoDAO.buscarPorId(rs.getInt("produto_id"));
         m.setProduto(p);
         m.setData(rs.getDate("data").toLocalDate());
         m.setQuantidade(rs.getDouble("quantidade"));

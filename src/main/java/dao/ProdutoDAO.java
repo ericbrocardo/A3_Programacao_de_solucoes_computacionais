@@ -180,19 +180,18 @@ public class ProdutoDAO {
 
     /**
      * Atualiza diretamente a quantidade em estoque de um produto,
-     * somando o valor informado ao estoque atual.
-     * Use valores negativos para subtrair do estoque.
+     * definindo o novo valor informado como saldo atual.
      *
      * @param produtoId Identificador do produto a ter o estoque atualizado
-     * @param quantidade Valor a ser somado ao estoque atual
+     * @param novaQtd Novo valor do estoque a ser definido
      * @throws RuntimeException se ocorrer erro na operação com o banco
      */
-    public void atualizarEstoque(int produtoId, double quantidade) {
-        String sql = "UPDATE produto SET qtd_estoque = qtd_estoque + ? WHERE id = ?";
+    public void atualizarEstoque(int produtoId, double novaQtd) {
+        String sql = "UPDATE produto SET qtd_estoque = ? WHERE id = ?";
         Connection conn = ConexaoDB.getConnection();
         try {
             PreparedStatement ps = conn.prepareStatement(sql);
-            ps.setDouble(1, quantidade);
+            ps.setDouble(1, novaQtd);
             ps.setInt(2, produtoId);
             ps.executeUpdate();
         } catch (SQLException e) {
