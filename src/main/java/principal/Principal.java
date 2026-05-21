@@ -3,7 +3,8 @@ package principal;
 import dao.ConexaoDB;
 import visao.FrmMenuPrincipal;
 
-import javax.swing.*;
+import javax.swing.JOptionPane;
+import javax.swing.SwingUtilities;
 
 public class Principal {
 
