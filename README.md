@@ -12,13 +12,20 @@ A cada movimentação de entrada ou saída, o saldo do produto é atualizado aut
 com alertas quando a quantidade estiver abaixo do mínimo ou acima do máximo definidos. 
 Além disso, o sistema oferece relatórios gerenciais para apoiar a tomada de decisão nas compras e no planejamento do estoque.
 
-## Funcionalidades
+## Requisitos Funcionais
 
-- CRUD de produtos e categorias
-- Registro de entradas e saídas no estoque
-- Alertas automáticos de quantidade mínima e máxima
-- Reajuste percentual de preços
-- Relatórios: lista de preços, balanço financeiro, produtos críticos, produtos por categoria e ranking de movimentações
+- RF 001: O sistema deve permitir cadastrar, editar, consultar e excluir produtos (CRUD) 
+- RF 002: O sistema deve permitir cadastrar, editar, consultar e excluir categorias (CRUD) 
+- RF 003: O sistema deve registrar movimentações de estoque do tipo entrada ou saída 
+- RF 004: O sistema deve atualizar automaticamente a quantidade em estoque a cada movimentação 
+- RF 005: O sistema deve alertar quando a quantidade do produto estiver abaixo do mínimo na saída 
+- RF 006: O sistema deve alertar quando a quantidade do produto estiver acima do máximo na entrada 
+- RF 007: O sistema deve permitir reajustar o preço de todos os produtos por um percentual informado 
+- RF 008: O sistema deve gerar relatório de lista de preços em ordem alfabética 
+- RF 009: O sistema deve gerar relatório de balanço físico e financeiro do estoque 
+- RF 010: O sistema deve gerar relatório dos produtos abaixo da quantidade mínima
+- RF 011: O sistema deve gerar relatório da quantidade de produtos distintos por categoria 
+- RF 012: O sistema deve gerar relatório do produto com maior número de entradas e saídas 
 
 ## Tecnologias Utilizadas
 
