@@ -18,6 +18,11 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 
+/**
+ * Tela de reajuste de preços dos produtos.
+ * Permite aplicar um percentual de aumento ou redução
+ * nos preços de todos os produtos cadastrados no sistema.
+ */
 public class FrmReajuste extends JFrame {
 
     private JTextField txtPercentual;
@@ -25,10 +30,17 @@ public class FrmReajuste extends JFrame {
 
     private final ProdutoDAO produtoDAO = new ProdutoDAO();
 
+    /**
+     * Construtor da tela de reajuste de preços.
+     * Inicializa os componentes visuais da tela.
+     */
     public FrmReajuste() {
         initComponents();
     }
 
+    /**
+     * Inicializa e organiza todos os componentes visuais da tela.
+     */
     private void initComponents() {
         setTitle("Reajuste de Preços");
         setSize(400, 280);
@@ -90,6 +102,12 @@ public class FrmReajuste extends JFrame {
         add(pnlCentro, BorderLayout.CENTER);
     }
 
+    /**
+     * Aplica o percentual de reajuste informado nos preços de todos os produtos.
+     * Valida o campo de percentual, exibe confirmação ao usuário e
+     * atualiza os preços no banco de dados.
+     * Valores positivos aumentam o preço e valores negativos reduzem.
+     */
     private void aplicar() {
         String texto = txtPercentual.getText().trim().replace(",", ".");
 
@@ -123,21 +141,24 @@ public class FrmReajuste extends JFrame {
         if (Mensagem.confirmar(msg)) {
             try {
                 produtoDAO.reajustarPrecos(percentual);
-
                 lblResultado.setForeground(new Color(39, 174, 96));
                 lblResultado.setText(String.format(
                     "✔ Reajuste de %.2f%% aplicado com sucesso!", percentual
                 ));
-
                 txtPercentual.setText("");
-
-            } catch (Exception e) { // ✔️ CORRIGIDO AQUI
+            } catch (Exception e) {
                 lblResultado.setForeground(new Color(231, 76, 60));
                 lblResultado.setText("Erro: " + e.getMessage());
             }
         }
     }
 
+    /**
+     * Aplica estilo visual padronizado a um botão.
+     *
+     * @param btn Botão a ser estilizado
+     * @param cor Cor de fundo a ser aplicada
+     */
     private void estilizarBotao(JButton btn, Color cor) {
         btn.setBackground(cor);
         btn.setForeground(Color.WHITE);
