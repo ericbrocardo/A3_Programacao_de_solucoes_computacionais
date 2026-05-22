@@ -26,25 +26,36 @@ import java.awt.FlowLayout;
 import java.awt.Font;
 import java.util.List;
 
+/**
+ * Tela de relatórios do sistema de controle de estoque.
+ * Exibe relatórios de lista de preços, balanço físico/financeiro,
+ * produtos abaixo do mínimo, produtos por categoria e
+ * produtos mais movimentados.
+ */
 public class FrmRelatorio extends JFrame {
 
     private JPanel painelConteudo;
     private JLabel lblTitulo;
     private JLabel lblRodape;
-
-    // --- RF012: novos campos ---
     private JLabel lblDestaque;
     private JSpinner spinnerTop;
-    // ---------------------------
 
     private final ProdutoDAO produtoDAO = new ProdutoDAO();
     private final CategoriaDAO categoriaDAO = new CategoriaDAO();
     private final MovimentacaoDAO movDAO = new MovimentacaoDAO();
 
+    /**
+     * Construtor da tela de relatórios.
+     * Inicializa os componentes visuais da tela.
+     */
     public FrmRelatorio() {
         initComponents();
     }
 
+    /**
+     * Inicializa e organiza todos os componentes visuais da tela,
+     * incluindo os botões de navegação entre relatórios e o spinner Top N.
+     */
     private void initComponents() {
         setTitle("Relatórios");
         setSize(750, 560);
@@ -73,12 +84,10 @@ public class FrmRelatorio extends JFrame {
         pnlBotoes.add(btn4);
         pnlBotoes.add(btn5);
 
-        // --- RF012: spinner "Top N" adicionado ao painel de botões ---
         pnlBotoes.add(new JLabel("Top:"));
         spinnerTop = new JSpinner(new SpinnerNumberModel(5, 1, 50, 1));
         spinnerTop.setPreferredSize(new Dimension(55, 24));
         pnlBotoes.add(spinnerTop);
-        // --------------------------------------------------------------
 
         add(pnlBotoes, BorderLayout.NORTH);
 
@@ -91,7 +100,6 @@ public class FrmRelatorio extends JFrame {
         lblRodape = new JLabel("", SwingConstants.RIGHT);
         add(lblRodape, BorderLayout.SOUTH);
 
-        // --- RF012: painel sul com destaque + rodapé original ---
         lblDestaque = new JLabel(" ");
         lblDestaque.setFont(new Font("Segoe UI", Font.ITALIC, 12));
         lblDestaque.setForeground(new Color(180, 60, 0));
@@ -100,75 +108,83 @@ public class FrmRelatorio extends JFrame {
         pnlSul.add(lblDestaque, BorderLayout.NORTH);
         pnlSul.add(lblRodape, BorderLayout.SOUTH);
         add(pnlSul, BorderLayout.SOUTH);
-        // ---------------------------------------------------------
     }
 
+    /**
+     * Exibe o relatório de lista de preços de todos os produtos,
+     * com nome, preço, unidade e categoria.
+     */
     private void relListaPrecos() {
         DefaultTableModel m = new DefaultTableModel(
                 new String[]{"Nome", "Preço", "Unidade", "Categoria"}, 0);
-
         try {
             for (Produto p : produtoDAO.listarTodos()) {
                 m.addRow(new Object[]{
-                        p.getNome(),
-                        p.getPreco(),
-                        p.getUnidade(),
-                        p.getCategoria() != null ? p.getCategoria().getNome() : ""
+                    p.getNome(),
+                    p.getPreco(),
+                    p.getUnidade(),
+                    p.getCategoria() != null ? p.getCategoria().getNome() : ""
                 });
             }
         } catch (Exception e) {
             Mensagem.erro(e.getMessage());
         }
-
         exibirTabela(m);
     }
 
+    /**
+     * Exibe o relatório de balanço físico e financeiro do estoque,
+     * mostrando a quantidade em estoque e o valor total por produto.
+     */
     private void relBalanco() {
         DefaultTableModel m = new DefaultTableModel(
                 new String[]{"Nome", "Estoque", "Preço", "Total"}, 0);
-
         try {
             for (Produto p : produtoDAO.listarTodos()) {
                 double total = p.getPreco() * p.getQtdEstoque();
                 m.addRow(new Object[]{
-                        p.getNome(),
-                        p.getQtdEstoque(),
-                        p.getPreco(),
-                        total
+                    p.getNome(),
+                    p.getQtdEstoque(),
+                    p.getPreco(),
+                    total
                 });
             }
         } catch (Exception e) {
             Mensagem.erro(e.getMessage());
         }
-
         exibirTabela(m);
     }
 
+    /**
+     * Exibe o relatório de produtos com estoque abaixo da quantidade mínima,
+     * mostrando o nome, o mínimo definido e o estoque atual.
+     */
     private void relAbaixoMinimo() {
         DefaultTableModel m = new DefaultTableModel(
                 new String[]{"Nome", "Min", "Estoque"}, 0);
-
         try {
             for (Produto p : produtoDAO.listarTodos()) {
                 if (p.getQtdEstoque() < p.getQtdMinima()) {
                     m.addRow(new Object[]{
-                            p.getNome(),
-                            p.getQtdMinima(),
-                            p.getQtdEstoque()
+                        p.getNome(),
+                        p.getQtdMinima(),
+                        p.getQtdEstoque()
                     });
                 }
             }
         } catch (Exception e) {
             Mensagem.erro(e.getMessage());
         }
-
         exibirTabela(m);
     }
 
+    /**
+     * Exibe o relatório de quantidade de produtos por categoria,
+     * listando apenas categorias que possuem produtos cadastrados.
+     */
     private void relPorCategoria() {
         DefaultTableModel m = new DefaultTableModel(
                 new String[]{"Categoria", "Qtd"}, 0);
-
         try {
             List<Produto> produtos = produtoDAO.listarTodos();
             List<Categoria> categorias = categoriaDAO.listarTodas();
@@ -178,7 +194,6 @@ public class FrmRelatorio extends JFrame {
                         .filter(p -> p.getCategoria() != null &&
                                 p.getCategoria().getId() == c.getId())
                         .count();
-
                 if (count > 0) {
                     m.addRow(new Object[]{c.getNome(), count});
                 }
@@ -186,11 +201,14 @@ public class FrmRelatorio extends JFrame {
         } catch (Exception e) {
             Mensagem.erro(e.getMessage());
         }
-
         exibirTabela(m);
     }
 
-    // --- RF012: método substituído para exibir tabela com destaque ---
+    /**
+     * Exibe o relatório dos produtos mais movimentados, limitado pelo valor
+     * definido no spinner Top N. Destaca o produto campeão em dourado
+     * e exibe um resumo no rodapé da tela.
+     */
     private void relMaisMovimentados() {
         lblDestaque.setText(" ");
 
@@ -228,7 +246,6 @@ public class FrmRelatorio extends JFrame {
         tabela.getTableHeader().setFont(new Font("Segoe UI", Font.BOLD, 12));
         tabela.getColumnModel().getColumn(0).setMaxWidth(40);
 
-        // Destaque dourado na 1ª linha (produto campeão)
         tabela.setDefaultRenderer(Object.class, new DefaultTableCellRenderer() {
             @Override
             public Component getTableCellRendererComponent(
@@ -252,8 +269,12 @@ public class FrmRelatorio extends JFrame {
         painelConteudo.revalidate();
         painelConteudo.repaint();
     }
-    // -----------------------------------------------------------------
 
+    /**
+     * Exibe um modelo de tabela no painel central da tela.
+     *
+     * @param m Modelo de tabela a ser exibido
+     */
     private void exibirTabela(DefaultTableModel m) {
         painelConteudo.removeAll();
         painelConteudo.add(new JScrollPane(new JTable(m)));
