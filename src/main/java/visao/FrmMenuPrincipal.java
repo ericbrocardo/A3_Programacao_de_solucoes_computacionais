@@ -25,6 +25,10 @@ public class FrmMenuPrincipal extends JFrame {
      */
     public FrmMenuPrincipal() {
         initComponents();
+        
+     setResizable(true);
+    setLocationRelativeTo(null);
+    
     }
 
     /**
