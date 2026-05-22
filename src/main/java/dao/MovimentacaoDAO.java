@@ -139,6 +139,90 @@ public class MovimentacaoDAO {
     }
 
     /**
+     * Retorna o produto com maior volume total de movimentações
+     * (entradas + saídas combinadas).
+     *
+     * @return List com um Object[] contendo: [id, nome, codigo, total_entradas, total_saidas, total_movimentacoes]
+     *         ou lista vazia se não houver movimentações
+     * @throws SQLException se ocorrer erro na operação com o banco
+     */
+    public List<Object[]> getProdutoMaiorMovimentacao() throws SQLException {
+        List<Object[]> resultado = new ArrayList<>();
+        String sql = """
+            SELECT
+                p.id,
+                p.nome,
+                p.codigo,
+                SUM(CASE WHEN m.tipo = 'ENTRADA' THEN m.quantidade ELSE 0 END) AS total_entradas,
+                SUM(CASE WHEN m.tipo = 'SAIDA'   THEN m.quantidade ELSE 0 END) AS total_saidas,
+                SUM(m.quantidade) AS total_movimentacoes
+            FROM movimentacao m
+            JOIN produto p ON p.id = m.produto_id
+            GROUP BY p.id, p.nome, p.codigo
+            ORDER BY total_movimentacoes DESC
+            LIMIT 1
+        """;
+        try (Connection conn = ConexaoDB.getConnection();
+             Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery(sql)) {
+            if (rs.next()) {
+                resultado.add(new Object[]{
+                    rs.getInt("id"),
+                    rs.getString("nome"),
+                    rs.getString("codigo"),
+                    rs.getDouble("total_entradas"),
+                    rs.getDouble("total_saidas"),
+                    rs.getDouble("total_movimentacoes")
+                });
+            }
+        }
+        return resultado;
+    }
+
+    /**
+     * Retorna os N produtos com maior volume total de movimentações
+     * (entradas + saídas combinadas), ordenados de forma decrescente.
+     *
+     * @param limite Quantidade máxima de produtos a retornar
+     * @return List de Object[] contendo: [id, nome, codigo, total_entradas, total_saidas, total_movimentacoes]
+     * @throws SQLException se ocorrer erro na operação com o banco
+     */
+    public List<Object[]> getTopProdutosMaiorMovimentacao(int limite) throws SQLException {
+        List<Object[]> resultado = new ArrayList<>();
+        String sql = """
+            SELECT
+                p.id,
+                p.nome,
+                p.codigo,
+                SUM(CASE WHEN m.tipo = 'ENTRADA' THEN m.quantidade ELSE 0 END) AS total_entradas,
+                SUM(CASE WHEN m.tipo = 'SAIDA'   THEN m.quantidade ELSE 0 END) AS total_saidas,
+                SUM(m.quantidade) AS total_movimentacoes
+            FROM movimentacao m
+            JOIN produto p ON p.id = m.produto_id
+            GROUP BY p.id, p.nome, p.codigo
+            ORDER BY total_movimentacoes DESC
+            LIMIT ?
+        """;
+        try (Connection conn = ConexaoDB.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, limite);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    resultado.add(new Object[]{
+                        rs.getInt("id"),
+                        rs.getString("nome"),
+                        rs.getString("codigo"),
+                        rs.getDouble("total_entradas"),
+                        rs.getDouble("total_saidas"),
+                        rs.getDouble("total_movimentacoes")
+                    });
+                }
+            }
+        }
+        return resultado;
+    }
+
+    /**
      * Mapeia uma linha do ResultSet para um objeto Movimentacao,
      * buscando o produto completo incluindo sua categoria.
      *
