@@ -25,6 +25,11 @@ import java.awt.Insets;
 import javax.swing.table.DefaultTableModel;
 import java.util.List;
 
+/**
+ * Tela de cadastro e gerenciamento de produtos.
+ * Permite inserir, atualizar, excluir e listar produtos,
+ * além de alertar sobre estoque baixo ou acima do máximo.
+ */
 public class FrmProduto extends JFrame {
 
     private JTextField txtNome, txtUnidade, txtPreco;
@@ -37,12 +42,19 @@ public class FrmProduto extends JFrame {
     private final CategoriaDAO categoriaDAO = new CategoriaDAO();
     private Produto produtoSelecionado = null;
 
+    /**
+     * Construtor da tela de produtos.
+     * Inicializa os componentes, carrega as categorias e a tabela de produtos.
+     */
     public FrmProduto() {
         initComponents();
         carregarCategorias();
         carregarTabela();
     }
 
+    /**
+     * Inicializa e organiza todos os componentes visuais da tela.
+     */
     private void initComponents() {
         setTitle("Produtos");
         setSize(780, 540);
@@ -58,26 +70,21 @@ public class FrmProduto extends JFrame {
         gbc.insets = new Insets(6, 8, 6, 8);
         gbc.fill = GridBagConstraints.HORIZONTAL;
 
-        gbc.gridy = 0;
-        gbc.gridx = 0;
+        gbc.gridy = 0; gbc.gridx = 0;
         pnlForm.add(new JLabel("Nome:"), gbc);
 
-        gbc.gridx = 1;
-        gbc.gridwidth = 3;
-        gbc.weightx = 1;
+        gbc.gridx = 1; gbc.gridwidth = 3; gbc.weightx = 1;
         txtNome = new JTextField();
         pnlForm.add(txtNome, gbc);
 
-        gbc.gridx = 4;
-        gbc.gridwidth = 1;
+        gbc.gridx = 4; gbc.gridwidth = 1;
         pnlForm.add(new JLabel("Unidade:"), gbc);
 
         gbc.gridx = 5;
         txtUnidade = new JTextField();
         pnlForm.add(txtUnidade, gbc);
 
-        gbc.gridy = 1;
-        gbc.gridx = 0;
+        gbc.gridy = 1; gbc.gridx = 0;
         pnlForm.add(new JLabel("Preço (R$):"), gbc);
 
         gbc.gridx = 1;
@@ -87,15 +94,11 @@ public class FrmProduto extends JFrame {
         gbc.gridx = 2;
         pnlForm.add(new JLabel("Categoria:"), gbc);
 
-        gbc.gridx = 3;
-        gbc.gridwidth = 3;
+        gbc.gridx = 3; gbc.gridwidth = 3;
         cmbCategoria = new JComboBox<>();
         pnlForm.add(cmbCategoria, gbc);
 
-        gbc.gridy = 2;
-        gbc.gridwidth = 1;
-
-        gbc.gridx = 0;
+        gbc.gridy = 2; gbc.gridwidth = 1; gbc.gridx = 0;
         pnlForm.add(new JLabel("Qtd. Estoque:"), gbc);
 
         gbc.gridx = 1;
@@ -129,9 +132,7 @@ public class FrmProduto extends JFrame {
         pnlBotoes.add(btnLimpar);
         pnlBotoes.add(btnExcluir);
 
-        gbc.gridx = 0;
-        gbc.gridy = 3;
-        gbc.gridwidth = 6;
+        gbc.gridx = 0; gbc.gridy = 3; gbc.gridwidth = 6;
         pnlForm.add(pnlBotoes, gbc);
 
         add(pnlForm, BorderLayout.NORTH);
@@ -155,6 +156,11 @@ public class FrmProduto extends JFrame {
         add(new JScrollPane(tabela), BorderLayout.CENTER);
     }
 
+    /**
+     * Salva ou atualiza um produto no banco de dados.
+     * Valida os campos obrigatórios e alerta sobre estoque
+     * abaixo do mínimo ou acima do máximo permitido.
+     */
     private void salvar() {
         try {
             Categoria categoria = (Categoria) cmbCategoria.getSelectedItem();
@@ -216,6 +222,10 @@ public class FrmProduto extends JFrame {
         }
     }
 
+    /**
+     * Exclui o produto selecionado na tabela após confirmação do usuário.
+     * Exibe mensagem de erro caso o produto possua movimentações cadastradas.
+     */
     private void excluir() {
         if (produtoSelecionado == null) {
             Mensagem.erro("Selecione um produto para excluir.");
@@ -229,24 +239,20 @@ public class FrmProduto extends JFrame {
                 JOptionPane.YES_NO_OPTION
         );
 
-        if (confirmacao != JOptionPane.YES_OPTION) {
-            return;
-        }
+        if (confirmacao != JOptionPane.YES_OPTION) return;
 
         try {
             produtoDAO.excluir(produtoSelecionado.getId());
             Mensagem.info("Produto excluído!");
             limpar();
             carregarTabela();
-
         } catch (Exception e) {
             String erro = e.getMessage();
             if (erro != null && (
                     erro.contains("foreign key constraint fails")
                     || erro.contains("Cannot delete or update a parent row")
                     || erro.contains("movimentacao")
-                    || erro.contains("produto_id")
-            )) {
+                    || erro.contains("produto_id"))) {
                 Mensagem.erro("Não é possível excluir este produto, pois ele possui movimentações cadastradas.");
             } else {
                 Mensagem.erro("Erro ao excluir produto: " + erro);
@@ -254,6 +260,9 @@ public class FrmProduto extends JFrame {
         }
     }
 
+    /**
+     * Limpa todos os campos do formulário e remove a seleção da tabela.
+     */
     private void limpar() {
         txtNome.setText("");
         txtUnidade.setText("");
@@ -261,21 +270,19 @@ public class FrmProduto extends JFrame {
         txtQtdEstoque.setText("");
         txtQtdMinima.setText("");
         txtQtdMaxima.setText("");
-
         if (cmbCategoria.getItemCount() > 0) {
             cmbCategoria.setSelectedIndex(-1);
         }
-
         produtoSelecionado = null;
         tabela.clearSelection();
     }
 
+    /**
+     * Carrega os dados do produto selecionado na tabela para os campos do formulário.
+     */
     private void selecionarLinha() {
         int linha = tabela.getSelectedRow();
-
-        if (linha < 0) {
-            return;
-        }
+        if (linha < 0) return;
 
         try {
             int id = (int) modelo.getValueAt(linha, 0);
@@ -297,48 +304,46 @@ public class FrmProduto extends JFrame {
                     }
                 }
             }
-
         } catch (Exception e) {
             Mensagem.erro("Erro: " + e.getMessage());
         }
     }
 
+    /**
+     * Carrega todos os produtos do banco de dados e exibe na tabela.
+     */
     private void carregarTabela() {
         modelo.setRowCount(0);
-
         try {
             List<Produto> lista = produtoDAO.listarTodos();
-
             for (Produto p : lista) {
                 modelo.addRow(new Object[]{
-                        p.getId(),
-                        p.getNome(),
-                        p.getPreco(),
-                        p.getUnidade(),
-                        p.getQtdEstoque(),
-                        p.getQtdMinima(),
-                        p.getQtdMaxima(),
-                        p.getCategoria() != null ? p.getCategoria().getNome() : ""
+                    p.getId(),
+                    p.getNome(),
+                    p.getPreco(),
+                    p.getUnidade(),
+                    p.getQtdEstoque(),
+                    p.getQtdMinima(),
+                    p.getQtdMaxima(),
+                    p.getCategoria() != null ? p.getCategoria().getNome() : ""
                 });
             }
-
         } catch (Exception e) {
             Mensagem.erro("Erro: " + e.getMessage());
         }
     }
 
+    /**
+     * Carrega todas as categorias do banco de dados no combobox de categorias.
+     */
     private void carregarCategorias() {
         try {
             cmbCategoria.removeAllItems();
-
             List<Categoria> lista = categoriaDAO.listarTodas();
-
             for (Categoria c : lista) {
                 cmbCategoria.addItem(c);
             }
-
             cmbCategoria.setSelectedIndex(-1);
-
         } catch (Exception e) {
             Mensagem.erro("Erro ao carregar categorias: " + e.getMessage());
         }
