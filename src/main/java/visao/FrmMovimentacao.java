@@ -165,7 +165,6 @@ public class FrmMovimentacao extends JFrame {
             return;
         }
 
-        // Calcula novo saldo apenas para os alertas
         double novoSaldo;
         if (tipo == Tipo.ENTRADA) {
             novoSaldo = produto.getQtdEstoque() + quantidade;
@@ -174,26 +173,23 @@ public class FrmMovimentacao extends JFrame {
         }
 
         try {
-            // MovimentacaoDAO já atualiza o estoque internamente
             movDAO.inserir(new Movimentacao(0, produto, data, quantidade, tipo));
 
-            // Alertas de estoque
-            if (tipo == Tipo.SAIDA && novoSaldo < produto.getQtdMinima()) {
+            if (tipo == Tipo.SAIDA && novoSaldo <= produto.getQtdMinima()) {
                 Mensagem.aviso(
-                    "⚠️ ESTOQUE BAIXO!\n\n" +
+                    "ESTOQUE BAIXO!\n\n" +
                     "Produto: " + produto.getNome() + "\n" +
                     "Saldo atual: " + novoSaldo + "\n" +
-                    "Quantidade mínima: " + produto.getQtdMinima() + "\n\n" +
-                    "Providencie a compra deste produto!"
+                    "Quantidade mínima: " + produto.getQtdMinima()
                 );
             }
-            if (tipo == Tipo.ENTRADA && novoSaldo > produto.getQtdMaxima()) {
+
+            if (tipo == Tipo.ENTRADA && novoSaldo >= produto.getQtdMaxima()) {
                 Mensagem.aviso(
-                    "⚠️ ESTOQUE CHEIO!\n\n" +
+                    "ESTOQUE ACIMA DO MÁXIMO!\n\n" +
                     "Produto: " + produto.getNome() + "\n" +
                     "Saldo atual: " + novoSaldo + "\n" +
-                    "Quantidade máxima: " + produto.getQtdMaxima() + "\n\n" +
-                    "Não é necessário comprar mais deste produto!"
+                    "Quantidade máxima: " + produto.getQtdMaxima()
                 );
             }
 

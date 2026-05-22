@@ -157,15 +157,27 @@ public class FrmProduto extends JFrame {
 
     private void salvar() {
         try {
+            Categoria categoria = (Categoria) cmbCategoria.getSelectedItem();
+
+            if (categoria == null) {
+                Mensagem.aviso("Selecione uma categoria.");
+                return;
+            }
+
+            double preco = Double.parseDouble(txtPreco.getText());
+            double qtdEstoque = Double.parseDouble(txtQtdEstoque.getText());
+            double qtdMinima = Double.parseDouble(txtQtdMinima.getText());
+            double qtdMaxima = Double.parseDouble(txtQtdMaxima.getText());
+
             Produto p = new Produto(
                     produtoSelecionado != null ? produtoSelecionado.getId() : 0,
                     txtNome.getText(),
-                    Double.parseDouble(txtPreco.getText()),
+                    preco,
                     txtUnidade.getText(),
-                    Double.parseDouble(txtQtdEstoque.getText()),
-                    Double.parseDouble(txtQtdMinima.getText()),
-                    Double.parseDouble(txtQtdMaxima.getText()),
-                    (Categoria) cmbCategoria.getSelectedItem()
+                    qtdEstoque,
+                    qtdMinima,
+                    qtdMaxima,
+                    categoria
             );
 
             if (produtoSelecionado == null) {
@@ -174,6 +186,24 @@ public class FrmProduto extends JFrame {
             } else {
                 produtoDAO.atualizar(p);
                 Mensagem.info("Produto atualizado!");
+            }
+
+            if (qtdEstoque <= qtdMinima) {
+                Mensagem.aviso(
+                        "ESTOQUE BAIXO!\n\n" +
+                        "Produto: " + p.getNome() + "\n" +
+                        "Estoque atual: " + qtdEstoque + "\n" +
+                        "Quantidade mínima: " + qtdMinima
+                );
+            }
+
+            if (qtdEstoque >= qtdMaxima) {
+                Mensagem.aviso(
+                        "ESTOQUE ACIMA DO MÁXIMO!\n\n" +
+                        "Produto: " + p.getNome() + "\n" +
+                        "Estoque atual: " + qtdEstoque + "\n" +
+                        "Quantidade máxima: " + qtdMaxima
+                );
             }
 
             limpar();
@@ -258,12 +288,13 @@ public class FrmProduto extends JFrame {
             txtQtdMinima.setText(String.valueOf(produtoSelecionado.getQtdMinima()));
             txtQtdMaxima.setText(String.valueOf(produtoSelecionado.getQtdMaxima()));
 
-            // Seleciona a categoria correta pelo id
-            for (int i = 0; i < cmbCategoria.getItemCount(); i++) {
-                Categoria cat = cmbCategoria.getItemAt(i);
-                if (cat.getId() == produtoSelecionado.getCategoria().getId()) {
-                    cmbCategoria.setSelectedIndex(i);
-                    break;
+            if (produtoSelecionado.getCategoria() != null) {
+                for (int i = 0; i < cmbCategoria.getItemCount(); i++) {
+                    Categoria cat = cmbCategoria.getItemAt(i);
+                    if (cat.getId() == produtoSelecionado.getCategoria().getId()) {
+                        cmbCategoria.setSelectedIndex(i);
+                        break;
+                    }
                 }
             }
 

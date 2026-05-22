@@ -23,6 +23,10 @@ public class ProdutoDAO {
      * @throws RuntimeException se ocorrer erro na operação com o banco
      */
     public void inserir(Produto p) {
+        if (p.getCategoria() == null) {
+            throw new RuntimeException("Selecione uma categoria para o produto.");
+        }
+
         String sql = "INSERT INTO produto (nome, preco, unidade, qtd_estoque, qtd_minima, qtd_maxima, categoria_id) "
                    + "VALUES (?, ?, ?, ?, ?, ?, ?)";
         Connection conn = ConexaoDB.getConnection();
@@ -50,6 +54,10 @@ public class ProdutoDAO {
      * @throws RuntimeException se ocorrer erro na operação com o banco
      */
     public void atualizar(Produto p) {
+        if (p.getCategoria() == null) {
+            throw new RuntimeException("Selecione uma categoria para o produto.");
+        }
+
         String sql = "UPDATE produto SET nome = ?, preco = ?, unidade = ?, "
                    + "qtd_estoque = ?, qtd_minima = ?, qtd_maxima = ?, categoria_id = ? "
                    + "WHERE id = ?";
