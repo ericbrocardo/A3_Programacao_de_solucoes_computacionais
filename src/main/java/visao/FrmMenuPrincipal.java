@@ -58,7 +58,7 @@ public class FrmMenuPrincipal extends JFrame {
         JButton btnMovimentacoes = criarBotao("  Movimentações",      new Color(142, 68, 173));
         JButton btnReajuste      = criarBotao("  Reajuste de Preços", new Color(230, 126, 34));
         JButton btnRelatorios    = criarBotao("  Relatórios",         new Color(192, 57, 43));
-
+        
         btnCategorias.addActionListener(e -> abrirCategorias());
         btnProdutos.addActionListener(e -> abrirProdutos());
         btnMovimentacoes.addActionListener(e -> abrirMovimentacoes());

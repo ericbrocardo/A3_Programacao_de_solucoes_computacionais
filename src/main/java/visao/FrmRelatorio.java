@@ -58,7 +58,7 @@ public class FrmRelatorio extends JFrame {
      */
     private void initComponents() {
         setTitle("Relatórios");
-        setSize(750, 560);
+        setSize(1000, 700);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLayout(new BorderLayout(0, 8));
